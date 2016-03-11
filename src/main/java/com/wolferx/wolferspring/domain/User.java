@@ -12,7 +12,7 @@ public class User implements Serializable {
     @Id
     @GeneratedValue
     @Column(name="user_id")
-    private Long userId;
+    private Long id;
     private String email;
     private String username;
     private String password;
@@ -23,12 +23,17 @@ public class User implements Serializable {
 
     protected User() { }
 
-    public Long getUserId() {
-        return userId;
+    public User(Long userId) {
+        this.id = userId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    @Column(name="user_id")
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long userId) {
+        this.id = userId;
     }
 
     public String getEmail() {
@@ -86,4 +91,5 @@ public class User implements Serializable {
     public void setTime_updated(Date time_updated) {
         this.time_updated = time_updated;
     }
+
 }

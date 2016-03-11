@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -13,48 +12,45 @@ public class Post implements Serializable {
     @Id
     @GeneratedValue
     @Column(name="post_id")
-    private Long postId;
-    @Column(name="user_id")
+    private Long id;
+    @Column(name="user_id", insertable = false, updatable = false)
     private Long userId;
-    private String slug;
     private String title;
     private String tag;
+    private String slug;
     private Integer status;
     private Date time_created;
     private Date time_updated;
 
-
-    @ManyToOne
-    private User user;
+    // If response need join, then use this
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "user_id")
+    //private User user;
 
     protected Post() { }
 
     public Post(Long userId, String slug, String title, String tag) {
         this.userId = userId;
-        this.slug = slug;
         this.title = title;
         this.tag = tag;
+        this.slug = slug;
         this.status = 1;
     }
 
-    public Long getPostId() {
-        return postId;
+    @Column(name="post_id")
+    public Long getId() {
+        return id;
     }
 
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setId(Long postId) {
+        this.id = postId;
     }
 
+    @Column(name="user_id")
     public Long getUserId() { return userId; }
 
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -71,6 +67,14 @@ public class Post implements Serializable {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public Integer getStatus() {
@@ -97,11 +101,9 @@ public class Post implements Serializable {
         this.time_updated = time_updated;
     }
 
-    public User getUser() {
-        return user;
-    }
+    /*
+    public User getUser() { return user; }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public void setUser(User user) { this.user = user; }
+    */
 }
