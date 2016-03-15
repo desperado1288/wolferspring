@@ -1,17 +1,10 @@
-package com.wolferx.wolferspring.domain;
+package com.wolferx.wolferspring.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.sql.Date;
 
-@Entity
 public class User implements Serializable {
-    @Id
-    @GeneratedValue
-    @Column(name="user_id")
+
     private Long id;
     private String email;
     private String username;
@@ -27,7 +20,6 @@ public class User implements Serializable {
         this.id = userId;
     }
 
-    @Column(name="user_id")
     public Long getId() {
         return id;
     }

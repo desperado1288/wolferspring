@@ -30,8 +30,7 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-jdbc")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.jdbi:jdbi:2.72")
     compile("mysql:mysql-connector-java")
     compile("com.alibaba:fastjson:1.2.8")
     compile("com.google.guava:guava:19.0")
