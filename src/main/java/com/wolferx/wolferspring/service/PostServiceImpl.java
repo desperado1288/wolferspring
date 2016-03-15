@@ -1,32 +1,40 @@
 package com.wolferx.wolferspring.service;
 
 import com.wolferx.wolferspring.entity.Post;
-import com.wolferx.wolferspring.jdbi.dao.PostDao;
+import com.wolferx.wolferspring.data.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class PostServiceImpl implements PostService {
+
+    @Autowired
+    private DBI dbi;
+
+    private final PostDao postDao;
+
+    @Autowired
+    PostServiceImpl(final PostDao postDao) {
+        this.postDao = postDao;
+    }
 
     @Override
     public Post createPost(Long userId, String title, String tag,  String slug, String postBody) {
 
-        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
-
-        final PostDao postDao = dbi.open(PostDao.class);
-
         final Integer status = 1;
-        final Date timeCreated = new Date();
-        final Date timeUpdated = new Date();
-        final Long genPostId = postDao.createPost(userId, title, tag, slug, status, timeCreated, timeUpdated);
+        final Date timeCreated, timeUpdated;
+        timeCreated = timeUpdated = new Date();
+        final Long genPostId = this.postDao.createPost(userId, title, tag, slug, status, timeCreated, timeUpdated);
 
-        final Post post = postDao.findPostById(genPostId);
+        final Post post = this.postDao.findPostById(genPostId);
 
-        final Integer genPostDetailResp = postDao.createPostDetail(genPostId, postBody);
+        final Integer genPostDetailResp = this.postDao.createPostDetail(genPostId, postBody);
 
         postDao.close();
 
@@ -38,13 +46,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findAll() {
 
-        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
-
-        final PostDao postDao = dbi.open(PostDao.class);
-
-        final List<Post> posts = postDao.findAll();
-
-        postDao.close();
+        final List<Post> posts = this.postDao.findAll();
 
         return posts;
     }
@@ -52,13 +54,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post findById(Long postId) {
 
-        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
-
-        final PostDao postDao = dbi.open(PostDao.class);
-
-        final Post post = postDao.findPostById(postId);
-
-        postDao.close();
+        final Post post = this.postDao.findPostById(postId);
 
         return post;
     }
@@ -66,13 +62,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findAllMeta() {
 
-        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
-
-        final PostDao postDao = dbi.open(PostDao.class);
-
-        final List<Post> posts = postDao.findAllMeta();
-
-        postDao.close();
+        final List<Post> posts = this.postDao.findAllMeta();
 
         return posts;
     }

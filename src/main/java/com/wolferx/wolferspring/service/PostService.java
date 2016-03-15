@@ -1,6 +1,7 @@
 package com.wolferx.wolferspring.service;
 
 import com.wolferx.wolferspring.entity.Post;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

@@ -9,10 +9,6 @@ public class StartupRunner implements CommandLineRunner {
 
     protected final Logger logger = LoggerFactory.getLogger(StartupRunner.class);
 
-    // Using Jdbc directly if use pure SQL
-    //@Autowired
-    //private final JdbcTemplate jdbcTemplate;
-
     @Override
     public void run(String... strings) throws Exception {
 

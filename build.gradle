@@ -17,6 +17,7 @@ apply plugin: 'spring-boot'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+applicationDefaultJvmArgs = ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"]
 
 jar {
     baseName = 'wolferspring'
@@ -30,6 +31,7 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-jdbc")
     compile("org.jdbi:jdbi:2.72")
     compile("mysql:mysql-connector-java")
     compile("com.alibaba:fastjson:1.2.8")
