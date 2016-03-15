@@ -1,26 +1,36 @@
 package com.wolferx.wolferspring.service;
 
-import com.google.common.collect.Lists;
-import com.wolferx.wolferspring.domain.Post;
-import com.wolferx.wolferspring.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wolferx.wolferspring.entity.Post;
+import com.wolferx.wolferspring.jdbi.dao.PostDao;
+import org.skife.jdbi.v2.DBI;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+
+import java.util.Date;
 import java.util.List;
 
 @Service
-@Transactional
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private PostRepository postRepository;
-
     @Override
-    public Post createPost(Long userId, String slug, String title, String tag) {
+    public Post createPost(Long userId, String title, String tag,  String slug, String postBody) {
 
-        Post post = new Post(userId, slug, title, tag);
-        postRepository.save(post);
+        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
+
+        final PostDao postDao = dbi.open(PostDao.class);
+
+        final Integer status = 1;
+        final Date timeCreated = new Date();
+        final Date timeUpdated = new Date();
+        final Long genPostId = postDao.createPost(userId, title, tag, slug, status, timeCreated, timeUpdated);
+
+        final Post post = postDao.findPostById(genPostId);
+
+        final Integer genPostDetailResp = postDao.createPostDetail(genPostId, postBody);
+
+        postDao.close();
+
+        post.setPostBody(postBody);
 
         return post;
     }
@@ -28,38 +38,43 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findAll() {
 
-        return Lists.newArrayList(postRepository.findAll());
+        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
+
+        final PostDao postDao = dbi.open(PostDao.class);
+
+        final List<Post> posts = postDao.findAll();
+
+        postDao.close();
+
+        return posts;
     }
 
     @Override
-    public List<Post> findByUserId(Long userId) {
+    public Post findById(Long postId) {
 
-        return postRepository.findByUserId(userId);
+        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
+
+        final PostDao postDao = dbi.open(PostDao.class);
+
+        final Post post = postDao.findPostById(postId);
+
+        postDao.close();
+
+        return post;
     }
 
     @Override
-    public Post findOne(Long postId) {
+    public List<Post> findAllMeta() {
 
-        return null;
+        final DBI dbi = new DBI("jdbc:mysql://localhost/wolferx_test", "wolferx", "wolferx");
+
+        final PostDao postDao = dbi.open(PostDao.class);
+
+        final List<Post> posts = postDao.findAllMeta();
+
+        postDao.close();
+
+        return posts;
     }
 
-    @Override
-    public void delete(Long postId) {
-
-    }
-
-    @Override
-    public List<Post> findByName(String name) {
-        return null;
-    }
-
-    @Override
-    public List<Post> findByNameAndAuthor(String name, String author) {
-        return null;
-    }
-
-    @Override
-    public List<Post> findByPrice(Long price) {
-        return null;
-    }
 }
