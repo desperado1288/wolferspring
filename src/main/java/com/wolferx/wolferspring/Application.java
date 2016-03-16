@@ -16,7 +16,7 @@ public class Application {
 
     public static void main(String[] args) {
 
-        logger.info("Initiating Spring Boot Restful API server...");
+        logger.info("Starting WolferSpring Restful API server...");
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(Application.class, args);
 
