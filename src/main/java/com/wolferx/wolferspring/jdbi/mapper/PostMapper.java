@@ -19,7 +19,8 @@ public class PostMapper implements ResultSetMapper<Post>
             r.getString("slug"),
             r.getInt("status"),
             r.getDate("time_created"),
-            r.getDate("time_updated")
+            r.getDate("time_updated"),
+            r.getString("post_body")
         );
 
         return post;
