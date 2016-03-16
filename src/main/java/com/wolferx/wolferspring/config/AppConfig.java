@@ -1,6 +1,6 @@
 package com.wolferx.wolferspring.config;
 
-import com.wolferx.wolferspring.data.dao.PostDao;
+import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

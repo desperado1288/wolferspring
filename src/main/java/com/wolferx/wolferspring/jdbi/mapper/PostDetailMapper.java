@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.data.mapper;
+package com.wolferx.wolferspring.jdbi.mapper;
 
 import com.wolferx.wolferspring.entity.Post;
 import org.skife.jdbi.v2.StatementContext;

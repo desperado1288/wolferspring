@@ -1,9 +1,9 @@
-package com.wolferx.wolferspring.data.dao;
+package com.wolferx.wolferspring.jdbi.dao;
 
 
 import com.wolferx.wolferspring.entity.Post;
-import com.wolferx.wolferspring.data.mapper.PostDetailMapper;
-import com.wolferx.wolferspring.data.mapper.PostMapper;
+import com.wolferx.wolferspring.jdbi.mapper.PostDetailMapper;
+import com.wolferx.wolferspring.jdbi.mapper.PostMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -29,7 +29,7 @@ public interface PostDao {
         @Bind("time_created") final Date timeCreated,
         @Bind("time_updated") final Date timeUpdated);
 
-    @SqlQuery("SELECT * FROM post LEFT JOIN post_detail ON post.post_id = post_detail.post_id")
+    @SqlQuery("SELECT post.*, post_detail.post_body FROM post LEFT JOIN post_detail ON post.post_id = post_detail.post_id")
     List<Post> findAll();
 
     @SqlQuery("SELECT * FROM post")

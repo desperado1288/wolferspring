@@ -1,7 +1,7 @@
 package com.wolferx.wolferspring.service;
 
 import com.wolferx.wolferspring.entity.Post;
-import com.wolferx.wolferspring.data.dao.PostDao;
+import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
