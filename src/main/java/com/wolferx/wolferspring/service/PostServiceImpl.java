@@ -1,8 +1,10 @@
 package com.wolferx.wolferspring.service;
 
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.exceptions.DBIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,20 +27,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(Long userId, String title, String tag,  String slug, String postBody) {
+    public Post createPost(Long userId, String title, String tag, String slug, String postBody)
+        throws StorageServiceException {
 
         final Integer status = 1;
         final Date timeCreated, timeUpdated;
         timeCreated = timeUpdated = new Date();
-        final Long genPostId = this.postDao.createPost(userId, title, tag, slug, status, timeCreated, timeUpdated);
 
-        final Post post = this.postDao.findPostById(genPostId);
+        Post post;
+        try {
+            post = this.postDao.createPost(userId, title, tag, slug, status, postBody, timeCreated, timeUpdated);
 
-        final Integer genPostDetailResp = this.postDao.createPostDetail(genPostId, postBody);
-
-        postDao.close();
-
-        post.setPostBody(postBody);
+        } catch (final DBIException error) {
+            throw new StorageServiceException(
+                String.format("Error: create post for user: '%s' ", userId), error);
+        }
 
         return post;
     }

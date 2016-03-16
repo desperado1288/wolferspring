@@ -1,6 +1,7 @@
 package com.wolferx.wolferspring.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wolferx.wolferspring.common.exception.BaseException;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.service.PostService;
 import org.slf4j.Logger;
@@ -26,12 +27,15 @@ public class PostController {
     private PostService postService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Post> getAllPost() {
+    public List<Post> getAllPost()
+        throws BaseException {
+
         return postService.findAll();
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.GET)
-    public Map<String, Object> getPostByUserId(@PathVariable("postId") Long postId) {
+    public Map<String, Object> getPostByUserId(@PathVariable("postId") Long postId)
+        throws BaseException {
 
         logger.info("Start getPostById() for postId: " + postId);
 
@@ -63,7 +67,8 @@ public class PostController {
     */
 
     @RequestMapping(method = RequestMethod.POST)
-    public Map<String, Object> createPost(@RequestBody JSONObject requestBody) {
+    public Map<String, Object> createPost(@RequestBody JSONObject requestBody)
+        throws BaseException {
 
         JSONObject requestParams = requestBody.getJSONObject("post");
         Long userId = requestParams.getLong("userId");
