@@ -7,6 +7,9 @@ import com.wolferx.wolferspring.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +22,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping(value = "/api/post", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
 public class PostController {
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
@@ -30,7 +33,13 @@ public class PostController {
     public List<Post> getAllPost()
         throws BaseException {
 
-        return postService.findAll();
+        logger.info("Start getAllPost()");
+
+        final List<Post> posts = postService.findAll();
+
+        logger.info("End getAllPost()");
+
+        return posts;
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.GET)
@@ -39,7 +48,7 @@ public class PostController {
 
         logger.info("Start getPostById() for postId: " + postId);
 
-        Post post =  postService.findById(postId);
+        final Post post =  postService.findById(postId);
 
         Map<String, Object> response = new LinkedHashMap<String, Object>();
         response.put("message", "get post by postId: " + postId);
@@ -70,12 +79,12 @@ public class PostController {
     public Map<String, Object> createPost(@RequestBody JSONObject requestBody)
         throws BaseException {
 
-        JSONObject requestParams = requestBody.getJSONObject("post");
-        Long userId = requestParams.getLong("userId");
-        String slug = requestParams.getString("slug");
-        String title = requestParams.getString("title");
-        String tag = requestParams.getString("tag");
-        String body = requestParams.getString("body");
+        final JSONObject requestParams = requestBody.getJSONObject("post");
+        final Long userId = requestParams.getLong("userId");
+        final String slug = requestParams.getString("slug");
+        final String title = requestParams.getString("title");
+        final String tag = requestParams.getString("tag");
+        final String body = requestParams.getString("body");
 
         Post post = postService.createPost(userId, slug, title, tag, body);
 
