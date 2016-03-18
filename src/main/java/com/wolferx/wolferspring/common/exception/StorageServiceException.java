@@ -1,6 +1,5 @@
 package com.wolferx.wolferspring.common.exception;
 
-
 public class StorageServiceException extends BaseException {
 
     public StorageServiceException() {

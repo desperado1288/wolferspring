@@ -1,7 +1,7 @@
 package com.wolferx.wolferspring.config;
 
 import org.skife.jdbi.v2.DBI;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,13 +15,29 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-public class JdbiConfig implements TransactionManagementConfigurer {
+public class DatabaseConfig implements TransactionManagementConfigurer {
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String dbDriver;
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
+    @Value("${spring.datasource.username}")
+    private String dbUsername;
+
+    @Value("${spring.datasource.password}")
+    private String dbPassword;
 
     @Bean
     @ConfigurationProperties(prefix="spring.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder
             .create()
+            .driverClassName(this.dbDriver)
+            .url(this.dbUrl)
+            .username(this.dbUsername)
+            .password(this.dbPassword)
             .build();
     }
 
