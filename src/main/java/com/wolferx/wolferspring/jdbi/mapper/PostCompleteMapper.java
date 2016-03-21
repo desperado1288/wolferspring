@@ -7,7 +7,7 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PostMapper implements ResultSetMapper<Post>
+public class PostCompleteMapper implements ResultSetMapper<Post>
 {
     public Post map(int index, ResultSet r, StatementContext ctx) throws SQLException
     {
@@ -19,7 +19,8 @@ public class PostMapper implements ResultSetMapper<Post>
             r.getString("slug"),
             r.getInt("status"),
             r.getDate("time_created"),
-            r.getDate("time_updated")
+            r.getDate("time_updated"),
+            r.getString("post_body")
         );
 
         return post;
