@@ -1,6 +1,6 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageServiceException;
+import com.wolferx.wolferspring.common.exception.StorageException;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
@@ -28,7 +28,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post createPost(Long userId, String title, String tag, String slug, String postBody)
-        throws StorageServiceException {
+        throws StorageException {
 
         final Integer status = 1;
         final Date timeCreated, timeUpdated;
@@ -39,8 +39,8 @@ public class PostServiceImpl implements PostService {
             post = this.postDao.createPost(userId, title, tag, slug, status, postBody, timeCreated, timeUpdated);
 
         } catch (final DBIException error) {
-            throw new StorageServiceException(
-                String.format("Error: create post for user: '%s' ", userId), error);
+            throw new StorageException(
+                String.format("Error: [createPost] service for user: '%s' ", userId), error);
         }
 
         return post;
