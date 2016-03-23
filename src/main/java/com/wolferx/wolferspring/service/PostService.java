@@ -7,12 +7,12 @@ import java.util.List;
 
 public interface PostService {
 
-    Post createPost(Long userId, String title, String tag, String slug, String body) throws StorageException;
+    Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicIds, String tag, String slug) throws StorageException;
 
     List<Post> findAll();
 
-    List<Post> findAllMeta();
-
     Post findById(Long postId);
+
+    Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag, Integer status) throws StorageException;
 
 }

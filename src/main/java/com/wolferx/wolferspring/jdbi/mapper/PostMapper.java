@@ -14,9 +14,13 @@ public class PostMapper implements ResultSetMapper<Post>
         final Post post = new Post(
             r.getLong("post_id"),
             r.getLong("user_id"),
-            r.getString("title"),
-            r.getString("tag"),
+            r.getString("post_title"),
+            r.getString("post_body"),
+            r.getString("post_cover_url"),
+            r.getInt("type"),
+            r.getString("music_ids"),
             r.getString("slug"),
+            r.getString("tag"),
             r.getInt("status"),
             r.getDate("time_created"),
             r.getDate("time_updated")
