@@ -70,17 +70,38 @@ public class PostController {
     @RequestMapping(method = RequestMethod.POST)
     public Post createPost(@RequestBody JSONObject requestBody)
         throws BaseException {
-
+        logger.info("Start createPost()");
         final JSONObject requestParams = requestBody.getJSONObject("post");
         final Long userId = requestParams.getLong("userId");
+        final String title = requestParams.getString("post_title");
+        final String body = requestParams.getString("post_body");
+        final String postCoverUrl = requestParams.getString("post_cover_url");
+        final String musicIds = requestParams.getString("music_ids");
+        final Integer type = musicIds.equals("") ? 0 : 1;
         final String slug = requestParams.getString("slug");
-        final String title = requestParams.getString("title");
         final String tag = requestParams.getString("tag");
-        final String body = requestParams.getString("body");
 
-        Post post = postService.createPost(userId, slug, title, tag, body);
-
+        Post post = postService.createPost(userId, title, body, postCoverUrl, type, musicIds, slug, tag);
+        logger.info("End createPost()");
         return post;
     }
 
+    @RequestMapping(method = RequestMethod.PUT)
+    public Post updatePost(@RequestBody JSONObject requestBody)
+        throws BaseException {
+        logger.info("Start updatePost()");
+        final JSONObject requestParams = requestBody.getJSONObject("post");
+        final Long postId = requestParams.getLong("postId");
+        final String title = requestParams.getString("post_title");
+        final String body = requestParams.getString("post_body");
+        final String postCoverUrl = requestParams.getString("post_cover_url");
+        final String musicIds = requestParams.getString("music_ids");
+        final Integer type = musicIds.equals("") ? 0 : 1;
+        final String slug = requestParams.getString("slug");
+        final String tag = requestParams.getString("tag");
+        logger.info("Start updatePost() by postId: " + postId);
+        Post post = postService.createPost(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
+
+        return post;
+    }
 }

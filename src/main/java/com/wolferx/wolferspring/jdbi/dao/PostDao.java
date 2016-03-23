@@ -2,8 +2,6 @@ package com.wolferx.wolferspring.jdbi.dao;
 
 
 import com.wolferx.wolferspring.entity.Post;
-import com.wolferx.wolferspring.jdbi.mapper.PostCompleteMapper;
-import com.wolferx.wolferspring.jdbi.mapper.PostDetailMapper;
 import com.wolferx.wolferspring.jdbi.mapper.PostMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
@@ -12,54 +10,72 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 
-@RegisterMapper(PostCompleteMapper.class)
+@RegisterMapper(PostMapper.class)
 public abstract class PostDao {
 
     @SqlUpdate(
-        "INSERT INTO post (user_id, title, tag, slug, status, time_created, time_updated) " +
-        "VALUES (:user_id, :title, :tag, :slug, :status, :time_created, :time_updated)")
+        "INSERT INTO post (user_id, post_title, post_body, post_cover_url, type, music_ids, slug, tag, status, time_created, time_updated) " +
+        "VALUES (:user_id, :post_title, :post_body, :post_cover_url, :type, :music_ids, :slug, :tag, :status, :time_created, :time_updated)")
     @Mapper(PostMapper.class)
     @GetGeneratedKeys
     public abstract Long insertPost(
         @Bind("user_id") final Long userId,
-        @Bind("title") final String title,
-        @Bind("tag") final String tag,
+        @Bind("post_title") final String post_title,
+        @Bind("post_body") final String post_body,
+        @Bind("post_cover_url") final String post_cover_url,
+        @Bind("type") final Integer type,
+        @Bind("music_ids") final String music_ids,
         @Bind("slug") final String slug,
+        @Bind("tag") final String tag,
         @Bind("status") final Integer status,
         @Bind("time_created") final Date timeCreated,
         @Bind("time_updated") final Date timeUpdated);
 
-    @SqlUpdate("INSERT INTO post_detail (post_id, post_body) VALUES (:post_id, :post_body)")
-    @Mapper(PostDetailMapper.class)
-    public abstract Integer insertPostDetail(
-        @Bind("post_id") final Long postId,
-        @Bind("post_body") final String postBody);
+    @SqlUpdate(
+        "UPDATE post SET post_title = :post_title, post_body = :post_body, post_cover_url = :post_cover_url, type = :type, music_ids = :music_ids," +
+        "slug = :slug, tag = :tag, status = :status, time_updated = :time_updated WHERE post_id = :post_id")
+    public abstract void updatePost(
+        @Bind("post_title") final String post_title,
+        @Bind("post_body") final String post_body,
+        @Bind("post_cover_url") final String post_cover_url,
+        @Bind("type") final Integer type,
+        @Bind("music_ids") final String music_ids,
+        @Bind("slug") final String slug,
+        @Bind("tag") final String tag,
+        @Bind("status") final Integer status,
+        @Bind("time_updated") final Date timeUpdated);
 
-    @SqlQuery("SELECT P.*, PD.post_body FROM post as P LEFT JOIN post_detail as PD ON P.post_id = PD.post_id")
-    public abstract List<Post> findAll();
 
     @SqlQuery("SELECT * FROM post")
-    public abstract List<Post> findAllMeta();
+    public abstract List<Post> findAll();
 
-    @SqlQuery("SELECT P.*, PD.post_body FROM post as P LEFT JOIN post_detail as PD ON P.post_id = PD.post_id WHERE P.post_id = :post_id")
-    public  abstract Post findPostById(@Bind("post_id") final Long postId);
+    @SqlQuery("SELECT * FROM post WHERE post_id = :post_id")
+    public abstract Post findPostById(@Bind("post_id") final Long postId);
 
     @Transaction
-    public Post createPost(Long userId, String title, String tag, String slug,
-                           Integer status, String postBody, Date timeCreated, Date timeUpdated) {
+    public Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag,
+                           Integer status, Date timeCreated, Date timeUpdated) {
 
-        final Long genPostId = insertPost(userId, title, tag, slug, status, timeCreated, timeUpdated);
-        insertPostDetail(genPostId, postBody);
+        final Long genPostId = insertPost(userId, title, body, postCoverUrl, type, musicids, slug, tag, status, timeCreated, timeUpdated);
 
         Post post = findPostById(genPostId);
 
         return post;
     }
 
+    @Transaction
+    public Post update(Long post_id, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag,
+                           Integer status, Date timeUpdated) {
+
+        updatePost(title, body, postCoverUrl, type, musicids, slug, tag, status, timeUpdated);
+
+        Post post = findPostById(post_id);
+
+        return post;
+    }
     public abstract void close();
 }

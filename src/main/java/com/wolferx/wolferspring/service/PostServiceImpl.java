@@ -27,8 +27,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(Long userId, String title, String tag, String slug, String postBody)
-        throws StorageException {
+    public Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag)
+            throws StorageException {
 
         final Integer status = 1;
         final Date timeCreated, timeUpdated;
@@ -36,11 +36,11 @@ public class PostServiceImpl implements PostService {
 
         Post post;
         try {
-            post = this.postDao.createPost(userId, title, tag, slug, status, postBody, timeCreated, timeUpdated);
+            post = this.postDao.createPost(userId, title, body, postCoverUrl, type, musicids, slug, tag, status, timeCreated, timeUpdated);
 
         } catch (final DBIException error) {
             throw new StorageException(
-                String.format("Error: [createPost] service for user: '%s' ", userId), error);
+                    String.format("Error: [createPost] service for user: '%s' ", userId), error);
         }
 
         return post;
@@ -63,11 +63,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findAllMeta() {
+    public Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag, Integer status)
+            throws StorageException{
+        final Date timeUpdated = new Date();
+        Post post;
+        try {
+            post = this.postDao.update(postId, title, body, postCoverUrl, type, musicIds, slug, tag, status, timeUpdated);
+        } catch (final DBIException error) {
+            throw new StorageException(String.format("Error: [updatePost] service for post: '%s' ", postId), error);
+        }
 
-        final List<Post> posts = this.postDao.findAllMeta();
-
-        return posts;
+        return post;
     }
-
 }
