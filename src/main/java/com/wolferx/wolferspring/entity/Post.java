@@ -5,6 +5,9 @@ import java.sql.Date;
 
 public class Post implements Serializable {
 
+    public static final Integer MUSIC_POST = 1;
+    public static final Integer TEXT_POST = 2;
+
     private Long postId;
     private Long userId;
     private String post_title;
