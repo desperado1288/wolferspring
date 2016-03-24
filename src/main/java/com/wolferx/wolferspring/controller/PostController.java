@@ -31,7 +31,7 @@ public class PostController {
         throws BaseException {
 
         logger.info("Start getAllPost()");
-        final List<Post> posts = postService.findAll();
+        final List<Post> posts = postService.findAll(true);
 
         logger.info("End getAllPost()");
 
@@ -77,7 +77,7 @@ public class PostController {
         final String body = requestParams.getString("post_body");
         final String postCoverUrl = requestParams.getString("post_cover_url");
         final String musicIds = requestParams.getString("music_ids");
-        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TEXT_POST : Post.MUSIC_POST;
+        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
         final String slug = requestParams.getString("slug");
         final String tag = requestParams.getString("tag");
 
@@ -97,7 +97,7 @@ public class PostController {
         final String body = requestParams.getString("post_body");
         final String postCoverUrl = requestParams.getString("post_cover_url");
         final String musicIds = requestParams.getString("music_ids");
-        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TEXT_POST : Post.MUSIC_POST;
+        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
         final String slug = requestParams.getString("slug");
         final String tag = requestParams.getString("tag");
 

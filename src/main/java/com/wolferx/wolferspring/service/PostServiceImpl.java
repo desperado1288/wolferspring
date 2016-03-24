@@ -47,9 +47,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> findAll() {
-
-        final List<Post> posts = this.postDao.findAll();
+    public List<Post> findAll(boolean all) {
+        List<Post> posts;
+        if(all) {
+            posts = this.postDao.findAll();
+        } else {
+            posts = this.postDao.findAllValid();
+        }
 
         return posts;
     }
