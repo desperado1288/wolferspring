@@ -1,6 +1,7 @@
 package com.wolferx.wolferspring.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wolferx.wolferspring.common.CommonUtil;
 import com.wolferx.wolferspring.common.exception.BaseException;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.service.PostService;
@@ -30,7 +31,6 @@ public class PostController {
         throws BaseException {
 
         logger.info("Start getAllPost()");
-
         final List<Post> posts = postService.findAll();
 
         logger.info("End getAllPost()");
@@ -45,7 +45,6 @@ public class PostController {
         logger.info("Start getPostById() for postId: " + postId);
 
         final Post post =  postService.findById(postId);
-
         logger.info("End getPostByUserId() for postId: " + postId);
         return post;
     }
@@ -70,6 +69,7 @@ public class PostController {
     @RequestMapping(method = RequestMethod.POST)
     public Post createPost(@RequestBody JSONObject requestBody)
         throws BaseException {
+
         logger.info("Start createPost()");
         final JSONObject requestParams = requestBody.getJSONObject("post");
         final Long userId = requestParams.getLong("userId");
@@ -77,7 +77,7 @@ public class PostController {
         final String body = requestParams.getString("post_body");
         final String postCoverUrl = requestParams.getString("post_cover_url");
         final String musicIds = requestParams.getString("music_ids");
-        final Integer type = musicIds.equals("") ? 0 : 1;
+        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TEXT_POST : Post.MUSIC_POST;
         final String slug = requestParams.getString("slug");
         final String tag = requestParams.getString("tag");
 
@@ -89,19 +89,22 @@ public class PostController {
     @RequestMapping(method = RequestMethod.PUT)
     public Post updatePost(@RequestBody JSONObject requestBody)
         throws BaseException {
-        logger.info("Start updatePost()");
+
+        logger.info("Initialize updatePost()");
         final JSONObject requestParams = requestBody.getJSONObject("post");
         final Long postId = requestParams.getLong("postId");
         final String title = requestParams.getString("post_title");
         final String body = requestParams.getString("post_body");
         final String postCoverUrl = requestParams.getString("post_cover_url");
         final String musicIds = requestParams.getString("music_ids");
-        final Integer type = musicIds.equals("") ? 0 : 1;
+        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TEXT_POST : Post.MUSIC_POST;
         final String slug = requestParams.getString("slug");
         final String tag = requestParams.getString("tag");
-        logger.info("Start updatePost() by postId: " + postId);
-        Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
 
+        logger.info("Start updatePost() by postId: " + postId);
+
+        Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
+        logger.info("End updatePost() by postId: " + postId);
         return post;
     }
 
@@ -109,8 +112,9 @@ public class PostController {
     public String deletePost(@PathVariable("postId") Long postId)
         throws BaseException {
         logger.info("Start deletePost() for postId: " + postId);
+
         postService.deleteById(postId);
-        logger.info("Start deletePost() for postId: " + postId);
+        logger.info("End deletePost() for postId: " + postId);
         return "deleted successfully";
     }
 }
