@@ -9,7 +9,8 @@ public interface PostService {
 
     Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicIds, String tag, String slug) throws StorageException;
 
-    List<Post> findAll();
+    List<Post> findAll(boolean all);
+
 
     Post findById(Long postId);
 

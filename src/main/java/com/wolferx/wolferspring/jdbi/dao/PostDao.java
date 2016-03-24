@@ -55,6 +55,9 @@ public abstract class PostDao {
     @SqlQuery("SELECT * FROM post")
     public abstract List<Post> findAll();
 
+    @SqlQuery("SELECT * FROM post WHERE status = 1")
+    public abstract List<Post> findAllValid();
+
     @SqlQuery("SELECT * FROM post WHERE post_id = :post_id")
     public abstract Post findPostById(@Bind("post_id") final Long postId);
 

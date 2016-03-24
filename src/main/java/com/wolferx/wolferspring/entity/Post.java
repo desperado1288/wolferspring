@@ -5,8 +5,10 @@ import java.sql.Date;
 
 public class Post implements Serializable {
 
-    public static final Integer MUSIC_POST = 1;
-    public static final Integer TEXT_POST = 2;
+    public static final Integer TYPE_MUSIC_POST = 1;
+    public static final Integer TYPE_TEXT_POST = 2;
+    public static final Integer STATUS_ACTIVE = 1;
+    public static final Integer STATUS_INACTIVE = 0;
 
     private Long postId;
     private Long userId;
@@ -56,8 +58,8 @@ public class Post implements Serializable {
         this.post_title = post_title;
         this.tag = tag;
         this.slug = slug;
-        this.status = 1;
-        this.type = 0;//TODO: type enum
+        this.status = STATUS_ACTIVE;
+        this.type = TYPE_TEXT_POST;
     }
 
 
