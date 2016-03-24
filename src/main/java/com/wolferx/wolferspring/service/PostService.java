@@ -13,6 +13,8 @@ public interface PostService {
 
     Post findById(Long postId);
 
-    Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag, Integer status) throws StorageException;
+    Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag) throws StorageException;
+
+    void deleteById(Long postId) throws StorageException;
 
 }

@@ -63,16 +63,26 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag, Integer status)
+    public Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag)
             throws StorageException{
         final Date timeUpdated = new Date();
         Post post;
         try {
-            post = this.postDao.update(postId, title, body, postCoverUrl, type, musicIds, slug, tag, status, timeUpdated);
+            post = this.postDao.update(postId, title, body, postCoverUrl, type, musicIds, slug, tag, timeUpdated);
         } catch (final DBIException error) {
             throw new StorageException(String.format("Error: [updatePost] service for post: '%s' ", postId), error);
         }
 
         return post;
     }
+
+    @Override
+    public void deleteById(Long postId) throws StorageException {
+        try {
+            this.postDao.deletePost(postId);
+        } catch (final DBIException error) {
+            throw new StorageException(String.format("Error: [deletePost] service for post: '%s' ", postId), error);
+        }
+    }
+
 }

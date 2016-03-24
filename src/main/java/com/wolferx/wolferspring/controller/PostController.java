@@ -100,8 +100,17 @@ public class PostController {
         final String slug = requestParams.getString("slug");
         final String tag = requestParams.getString("tag");
         logger.info("Start updatePost() by postId: " + postId);
-        Post post = postService.createPost(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
+        Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
 
         return post;
+    }
+
+    @RequestMapping(value="/{postId}", method = RequestMethod.DELETE)
+    public String deletePost(@PathVariable("postId") Long postId)
+        throws BaseException {
+        logger.info("Start deletePost() for postId: " + postId);
+        postService.deleteById(postId);
+        logger.info("Start deletePost() for postId: " + postId);
+        return "deleted successfully";
     }
 }

@@ -37,8 +37,9 @@ public abstract class PostDao {
 
     @SqlUpdate(
         "UPDATE post SET post_title = :post_title, post_body = :post_body, post_cover_url = :post_cover_url, type = :type, music_ids = :music_ids," +
-        "slug = :slug, tag = :tag, status = :status, time_updated = :time_updated WHERE post_id = :post_id")
+        "slug = :slug, tag = :tag, time_updated = :time_updated WHERE post_id = :post_id")
     public abstract void updatePost(
+        @Bind("post_id") final Long post_id,
         @Bind("post_title") final String post_title,
         @Bind("post_body") final String post_body,
         @Bind("post_cover_url") final String post_cover_url,
@@ -46,9 +47,10 @@ public abstract class PostDao {
         @Bind("music_ids") final String music_ids,
         @Bind("slug") final String slug,
         @Bind("tag") final String tag,
-        @Bind("status") final Integer status,
         @Bind("time_updated") final Date timeUpdated);
 
+    @SqlUpdate("UPDATE post SET status = 0 WHERE post_id = :post_id")
+    public abstract void deletePost(@Bind("post_id") final Long post_id);
 
     @SqlQuery("SELECT * FROM post")
     public abstract List<Post> findAll();
@@ -69,13 +71,16 @@ public abstract class PostDao {
 
     @Transaction
     public Post update(Long post_id, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag,
-                           Integer status, Date timeUpdated) {
+                           Date timeUpdated) {
 
-        updatePost(title, body, postCoverUrl, type, musicids, slug, tag, status, timeUpdated);
+        updatePost(post_id, title, body, postCoverUrl, type, musicids, slug, tag, timeUpdated);
 
         Post post = findPostById(post_id);
 
         return post;
     }
+
+
+
     public abstract void close();
 }
