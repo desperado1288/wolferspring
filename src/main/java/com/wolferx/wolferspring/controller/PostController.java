@@ -31,7 +31,7 @@ public class PostController {
         throws BaseException {
 
         logger.info("Start getAllPost()");
-        final List<Post> posts = postService.findAll(true);
+        final List<Post> posts = postService.findAll(false);
 
         logger.info("End getAllPost()");
 
@@ -91,20 +91,42 @@ public class PostController {
         throws BaseException {
 
         logger.info("Initialize updatePost()");
+
         final JSONObject requestParams = requestBody.getJSONObject("post");
-        final Long postId = requestParams.getLong("postId");
-        final String title = requestParams.getString("post_title");
-        final String body = requestParams.getString("post_body");
-        final String postCoverUrl = requestParams.getString("post_cover_url");
-        final String musicIds = requestParams.getString("music_ids");
-        final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
-        final String slug = requestParams.getString("slug");
-        final String tag = requestParams.getString("tag");
+
+        final Long postId = requestParams.getLong("post_id");
+        String title = requestParams.getString("post_title");
+        String body = requestParams.getString("post_body");
+        String postCoverUrl = requestParams.getString("post_cover_url");
+        String musicIds = requestParams.getString("music_ids");
+        String slug = requestParams.getString("slug");
+        String tag = requestParams.getString("tag");
+
+        final Post p = postService.findById(postId);
+        if(title != null && title.isEmpty()) {
+            title = p.getPost_title();
+        }
+        if(body != null && body.isEmpty()) {
+            body = p.getPost_body();
+        }
+        if(postCoverUrl != null && postCoverUrl.isEmpty()) {
+            postCoverUrl = p.getPost_cover_url();
+        }
+        if(musicIds != null && musicIds.isEmpty()) {
+            musicIds = p.getMusic_ids();
+        }
+        if(slug != null && slug.isEmpty()) {
+            slug = p.getSlug();
+        }
+        if(tag != null && tag.isEmpty()) {
+            tag = p.getTag();
+        }
+        Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
 
         logger.info("Start updatePost() by postId: " + postId);
-
         Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
         logger.info("End updatePost() by postId: " + postId);
+
         return post;
     }
 
