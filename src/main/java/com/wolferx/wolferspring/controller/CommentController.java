@@ -2,8 +2,6 @@ package com.wolferx.wolferspring.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.sun.media.jfxmedia.Media;
-import com.wolferx.wolferspring.common.CommonUtil;
 import com.wolferx.wolferspring.common.exception.BaseException;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.service.CommentService;
@@ -26,18 +24,18 @@ public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
     @Autowired
-    private CommentService cs;
+    private CommentService commentService;
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Comment> getAllComment() throws BaseException {
 
         logger.info("Start getAllComment()");
 
-        List<Comment> clist = cs.findAll(false);
+        List<Comment> comments = commentService.findAll(false);
 
         logger.info("End getAllComment()");
 
-        return clist;
+        return comments;
     }
 
     @RequestMapping(value = "/{post_id}", method = RequestMethod.GET)
@@ -46,7 +44,7 @@ public class CommentController {
 
         logger.info("Start getCommentByPostId for postId: " + post_id);
 
-        List<Comment> clist = cs.findByPostId(post_id);
+        List<Comment> clist = commentService.findByPostId(post_id);
 
         logger.info("End getCommentByPostId for postId: " + post_id);
 
@@ -65,7 +63,7 @@ public class CommentController {
         final Long music_id = requestParams.getLong("music_id");
         final String body = requestParams.getString("comment_body");
 
-        Comment c = cs.createComment(user_id, post_id, music_id, body);
+        Comment c = commentService.createComment(user_id, post_id, music_id, body);
 
         logger.info("End createComment()");
         return c;
@@ -79,7 +77,7 @@ public class CommentController {
 
         final JSONObject requestParams = requestBody.getJSONObject("comment");
         final Long comment_id = requestParams.getLong("comment_id");
-        final Comment c = cs.findByCommentId(comment_id);
+        final Comment c = commentService.findByCommentId(comment_id);
         Long music_id = requestParams.getLong("music_id");
         String body = requestParams.getString("comment_body");
 
@@ -91,7 +89,7 @@ public class CommentController {
         }
 
         logger.info("Start updateComment() for comment_id: " + comment_id);
-        Comment comment = cs.updateById(comment_id, music_id, body);
+        Comment comment = commentService.updateById(comment_id, music_id, body);
 
         logger.info("End updateComment() for comment_id: " + comment_id);
 
@@ -104,7 +102,7 @@ public class CommentController {
 
         logger.info("Start deleteComment() for comment_id: " + comment_id);
 
-        cs.deleteById(comment_id);
+        commentService.deleteById(comment_id);
 
         logger.info("End deleteComment() for comment_id: " + comment_id);
         return "deleted successfully";
