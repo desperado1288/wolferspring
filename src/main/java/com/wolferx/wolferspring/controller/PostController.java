@@ -71,15 +71,14 @@ public class PostController {
         throws BaseException {
 
         logger.info("Start createPost()");
-        final JSONObject requestParams = requestBody.getJSONObject("post");
-        final Long userId = requestParams.getLong("userId");
-        final String title = requestParams.getString("post_title");
-        final String body = requestParams.getString("post_body");
-        final String postCoverUrl = requestParams.getString("post_cover_url");
-        final String musicIds = requestParams.getString("music_ids");
+        final Long userId = requestBody.getInteger("userId").longValue();
+        final String title = requestBody.getString("postTitle");
+        final String body = requestBody.getString("postBody");
+        final String postCoverUrl = requestBody.getString("postCoverUrl");
+        final String musicIds = requestBody.getString("musicIds");
         final Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
-        final String slug = requestParams.getString("slug");
-        final String tag = requestParams.getString("tag");
+        final String slug = requestBody.getString("slug");
+        final String tag = requestBody.getString("tag");
 
         Post post = postService.createPost(userId, title, body, postCoverUrl, type, musicIds, slug, tag);
         logger.info("End createPost()");
