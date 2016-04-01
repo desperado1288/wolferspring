@@ -2,13 +2,17 @@ package com.wolferx.wolferspring.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wolferx.wolferspring.common.CommonUtil;
+import com.wolferx.wolferspring.common.annotation.LoggedUser;
 import com.wolferx.wolferspring.common.exception.BaseException;
+import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.Post;
+import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.service.PostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +23,17 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(value = "/api/v1/post", produces = {MediaType.APPLICATION_JSON_VALUE})
+@PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
+@RequestMapping(value = RouteConfig.POST_URL, produces = {MediaType.APPLICATION_JSON_VALUE})
 public class PostController {
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
+    private final PostService postService;
+
     @Autowired
-    private PostService postService;
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Post> getAllPost()
@@ -67,7 +76,7 @@ public class PostController {
     */
 
     @RequestMapping(method = RequestMethod.POST)
-    public Post createPost(@RequestBody JSONObject requestBody)
+    public Post createPost(@RequestBody JSONObject requestBody,  @LoggedUser User user)
         throws BaseException {
 
         logger.info("Start createPost()");
