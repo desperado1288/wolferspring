@@ -76,19 +76,20 @@ public class SecurityTest {
         RestAssured.baseURI = "https://localhost";
         RestAssured.keystore(keystoreFile, keystorePass);
         RestAssured.port = port;
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
         Mockito.reset(mockedExternalServiceAuthenticator, mockedServiceGateway);
     }
 
     @Test
     public void healthEndpoint_isAvailableToEveryone() {
         when().get("/health").
-                then().statusCode(HttpStatus.OK.value()).body("status", equalTo("UP"));
+            then().statusCode(HttpStatus.OK.value()).body("status", equalTo("UP"));
     }
 
     @Test
     public void metricsEndpoint_withoutBackendAdminCredentials_returnsUnauthorized() {
         when().get("/metrics").
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -96,8 +97,8 @@ public class SecurityTest {
         String username = "test_user_2";
         String password = "InvalidPassword";
         given().header(X_AUTH_USERNAME, username).header(X_AUTH_PASSWORD, password).
-                when().get("/metrics").
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            when().get("/metrics").
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -105,15 +106,15 @@ public class SecurityTest {
         String username = "backend_admin";
         String password = "remember_to_change_me_by_external_property_on_deploy";
         given().header(X_AUTH_USERNAME, username).header(X_AUTH_PASSWORD, password).
-                when().get("/metrics").
-                then().statusCode(HttpStatus.OK.value());
+            when().get("/metrics").
+            then().statusCode(HttpStatus.OK.value());
     }
 
     @Test
     public void authenticate_withoutPassword_returnsUnauthorized() {
         given().header(X_AUTH_USERNAME, "SomeUser").
-                when().post(RouteConfig.AUTHENTICATE_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            when().post(RouteConfig.AUTHENTICATE_URL).
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
     }
@@ -121,8 +122,8 @@ public class SecurityTest {
     @Test
     public void authenticate_withoutUsername_returnsUnauthorized() {
         given().header(X_AUTH_PASSWORD, "SomePassword").
-                when().post(RouteConfig.AUTHENTICATE_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            when().post(RouteConfig.AUTHENTICATE_URL).
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
     }
@@ -130,7 +131,7 @@ public class SecurityTest {
     @Test
     public void authenticate_withoutUsernameAndPassword_returnsUnauthorized() {
         when().post(RouteConfig.AUTHENTICATE_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
     }
@@ -146,24 +147,24 @@ public class SecurityTest {
         String password = "InvalidPassword";
 
         BDDMockito.when(mockedExternalServiceAuthenticator.authenticate(anyString(), anyString())).
-                thenThrow(new BadCredentialsException("Invalid Credentials"));
+            thenThrow(new BadCredentialsException("Invalid Credentials"));
 
         given().header(X_AUTH_USERNAME, username).header(X_AUTH_PASSWORD, password).
-                when().post(RouteConfig.AUTHENTICATE_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            when().post(RouteConfig.AUTHENTICATE_URL).
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
     public void gettingStuff_withoutToken_returnsUnauthorized() {
         when().get(RouteConfig.STUFF_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
     public void gettingStuff_withInvalidToken_returnsUnathorized() {
         given().header(X_AUTH_TOKEN, "InvalidToken").
-                when().get(RouteConfig.STUFF_URL).
-                then().statusCode(HttpStatus.UNAUTHORIZED.value());
+            when().get(RouteConfig.STUFF_URL).
+            then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -171,23 +172,24 @@ public class SecurityTest {
         String generatedToken = authenticateByUsernameAndPasswordAndGetToken();
 
         given().header(X_AUTH_TOKEN, generatedToken).
-                when().get(RouteConfig.STUFF_URL).
-                then().statusCode(HttpStatus.OK.value());
+            when().get(RouteConfig.STUFF_URL).
+            then().statusCode(HttpStatus.OK.value());
     }
 
     private String authenticateByUsernameAndPasswordAndGetToken() {
         String username = "test_user_2";
         String password = "ValidPassword";
 
-        AuthenticatedExternalWebService authenticationWithToken = new AuthenticatedExternalWebService(username, null,
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_DOMAIN_USER"));
+        AuthenticatedExternalWebService authenticationWithToken
+            = new AuthenticatedExternalWebService(username, null, AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_DOMAIN_USER"));
+
         BDDMockito.when(mockedExternalServiceAuthenticator.authenticate(eq(username), eq(password))).
-                thenReturn(authenticationWithToken);
+            thenReturn(authenticationWithToken);
 
         ValidatableResponse validatableResponse = given().header(X_AUTH_USERNAME, username).
-                header(X_AUTH_PASSWORD, password).
-                when().post(RouteConfig.AUTHENTICATE_URL).
-                then().statusCode(HttpStatus.OK.value());
+            header(X_AUTH_PASSWORD, password).
+            when().post(RouteConfig.AUTHENTICATE_URL).
+            then().statusCode(HttpStatus.OK.value());
         String generatedToken = authenticationWithToken.getToken();
         validatableResponse.body("token", equalTo(generatedToken));
 

@@ -22,8 +22,10 @@ public class UserPasswordAuthProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Optional<String> username = Optional.of(authentication.getPrincipal().toString());
-        Optional<String> password = Optional.of(authentication.getCredentials().toString());
+        @SuppressWarnings("unchecked")
+        Optional<String> username = (Optional<String>) authentication.getPrincipal();
+        @SuppressWarnings("unchecked")
+        Optional<String> password = (Optional<String>) authentication.getCredentials();
 
         if (!username.isPresent() || !password.isPresent()) {
             throw new BadCredentialsException("Invalid User Credentials");

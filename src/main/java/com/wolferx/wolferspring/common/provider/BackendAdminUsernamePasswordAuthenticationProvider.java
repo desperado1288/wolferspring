@@ -22,15 +22,16 @@ public class BackendAdminUsernamePasswordAuthenticationProvider implements Authe
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Optional<String> username = (Optional) authentication.getPrincipal();
-        Optional<String> password = (Optional) authentication.getCredentials();
+        @SuppressWarnings("unchecked")
+        Optional<String> username = (Optional<String>) authentication.getPrincipal();
+        @SuppressWarnings("unchecked")
+        Optional<String> password = (Optional<String>) authentication.getCredentials();
 
         if (credentialsMissing(username, password) || credentialsInvalid(username, password)) {
             throw new BadCredentialsException(INVALID_BACKEND_ADMIN_CREDENTIALS);
         }
 
-        return new UsernamePasswordAuthenticationToken(username.get(), null,
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_BACKEND_ADMIN"));
+        return new UsernamePasswordAuthenticationToken(username.get(), null, AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_BACKEND_ADMIN"));
     }
 
     private boolean credentialsMissing(Optional<String> username, Optional<String> password) {

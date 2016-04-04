@@ -74,6 +74,7 @@ dependencies {
     compile("com.auth0:java-jwt:2.1.0")
     compile("com.google.guava:guava:19.0")
 
+    /*
     compile 'commons-codec:commons-codec:1.4'
     compile('commons-httpclient:commons-httpclient:3.1') {
         exclude group: 'commons-logging'
@@ -83,6 +84,7 @@ dependencies {
 
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'org.apache.httpcomponents:httpcore:4.0.1'
+````*/
 
     // test
     testCompile 'org.springframework.boot:spring-boot-starter-test'
