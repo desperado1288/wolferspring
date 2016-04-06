@@ -1,12 +1,12 @@
 package com.wolferx.wolferspring.service;
 
-import com.google.common.base.Optional;
 import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.jdbi.dao.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> getUserByUserId(Long userId) {
         return userDao.getUserById(userId);
     }
 

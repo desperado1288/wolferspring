@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @Configuration
+//@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 @EnableWebSecurity
 @EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
