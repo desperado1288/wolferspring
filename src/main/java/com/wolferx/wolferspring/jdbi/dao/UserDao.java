@@ -1,11 +1,12 @@
 package com.wolferx.wolferspring.jdbi.dao;
 
-import com.google.common.base.Optional;
 import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.jdbi.mapper.UserMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
+
+import java.util.Optional;
 
 @RegisterMapper(UserMapper.class)
 public abstract class UserDao {
