@@ -7,8 +7,8 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PostMapper implements ResultSetMapper<Post>
-{
+public class PostMapper implements ResultSetMapper<Post> {
+
     public Post map(int index, ResultSet r, StatementContext ctx) throws SQLException
     {
         final Post post = new Post(

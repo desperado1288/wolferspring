@@ -5,31 +5,48 @@ import java.sql.Date;
 
 public class User implements Serializable {
 
-    private Long id;
+    private Long userId;
     private String email;
     private String username;
     private String password;
+    private Integer verified;
+    private Integer access_level;
     private Integer status;
-    private Date last_login;
-    private Date time_created;
-    private Date time_updated;
+    private Date lastLogin;
+    private Date timeCreated;
+    private Date timeUpdated;
 
     protected User() { }
 
     public User(Long userId) {
-        this.id = userId;
+        this.userId = userId;
+    }
+
+    public User(Long userId, String email, String username, String password, Integer verified,
+                Integer access_level, Integer status, Date lastLogin, Date timeCreated, Date timeUpdated) {
+
+        this.userId = userId;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.verified = verified;
+        this.access_level = access_level;
+        this.status = status;
+        this.lastLogin = lastLogin;
+        this.timeCreated = timeCreated;
+        this.timeUpdated = timeUpdated;
     }
 
     public User(String username) {
         this.username = username;
     }
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long userId) {
-        this.id = userId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
@@ -56,6 +73,22 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public Integer getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Integer verified) {
+        this.verified = verified;
+    }
+
+    public Integer getAccess_level() {
+        return access_level;
+    }
+
+    public void setAccess_level(Integer access_level) {
+        this.access_level = access_level;
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -64,28 +97,27 @@ public class User implements Serializable {
         this.status = status;
     }
 
-    public Date getLast_login() {
-        return last_login;
+    public Date getLastLogin() {
+        return lastLogin;
     }
 
-    public void setLast_login(Date last_login) {
-        this.last_login = last_login;
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
-    public Date getTime_created() {
-        return time_created;
+    public Date getTimeCreated() {
+        return timeCreated;
     }
 
-    public void setTime_created(Date time_created) {
-        this.time_created = time_created;
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
-    public Date getTime_updated() {
-        return time_updated;
+    public Date getTimeUpdated() {
+        return timeUpdated;
     }
 
-    public void setTime_updated(Date time_updated) {
-        this.time_updated = time_updated;
+    public void setTimeUpdated(Date timeUpdated) {
+        this.timeUpdated = timeUpdated;
     }
-
 }

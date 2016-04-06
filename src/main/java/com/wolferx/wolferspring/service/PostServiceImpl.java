@@ -16,13 +16,12 @@ import java.util.List;
 @Transactional
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private DBI dbi;
-
+    private final DBI dbi;
     private final PostDao postDao;
 
     @Autowired
-    PostServiceImpl(final PostDao postDao) {
+    PostServiceImpl(final DBI dbi, final PostDao postDao) {
+        this.dbi = dbi;
         this.postDao = postDao;
     }
 

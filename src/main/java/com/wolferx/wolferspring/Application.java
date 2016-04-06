@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 @SpringBootApplication
 @EnableWebMvc
 @EnableConfigurationProperties
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Application.class);

@@ -44,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
             .authorizeRequests()
-                .anyRequest().permitAll()
                 .antMatchers(actuatorEndpoints()).hasRole(backendAdminRole)
+                .anyRequest().permitAll()
                 .and()
             .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedEntryPoint());
@@ -57,8 +57,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.
+    protected void configure(AuthenticationManagerBuilder authenticationManager) throws Exception {
+        authenticationManager.
             authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
             authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
             authenticationProvider(tokenAuthenticationProvider());
