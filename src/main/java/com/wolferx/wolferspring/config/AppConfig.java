@@ -3,6 +3,7 @@ package com.wolferx.wolferspring.config;
 import com.wolferx.wolferspring.common.filter.CorsFilter;
 import com.wolferx.wolferspring.jdbi.dao.CommentDao;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
+import com.wolferx.wolferspring.jdbi.dao.UserDao;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -43,4 +44,6 @@ public class AppConfig {
     }
     @Bean
     public CommentDao commentDao() { return this.appDbi.onDemand(CommentDao.class); }
+    @Bean
+    public UserDao userDao() { return this.appDbi.onDemand(UserDao.class); }
 }

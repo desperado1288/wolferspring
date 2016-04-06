@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_DOMAIN_USER')")
+@PreAuthorize("hasAuthority('ROLE_USER')")
 @RequestMapping(value = RouteConfig.POST_URL, produces = {MediaType.APPLICATION_JSON_VALUE})
 public class PostController {
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);

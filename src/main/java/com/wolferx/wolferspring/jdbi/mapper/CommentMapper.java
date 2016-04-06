@@ -7,8 +7,8 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CommentMapper implements ResultSetMapper<Comment>
-{
+public class CommentMapper implements ResultSetMapper<Comment> {
+
     public Comment map(int index, ResultSet r, StatementContext ctx) throws SQLException
     {
         final Comment comment = new Comment(
