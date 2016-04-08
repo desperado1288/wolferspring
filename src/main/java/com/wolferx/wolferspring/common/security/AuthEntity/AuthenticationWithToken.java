@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.AuthEntity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -6,12 +6,13 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import java.util.Collection;
 
 public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken {
-    public AuthenticationWithToken(Object aPrincipal, Object aCredentials) {
-        super(aPrincipal, aCredentials);
+
+    public AuthenticationWithToken(Object principal, Object credential) {
+        super(principal, credential);
     }
 
-    public AuthenticationWithToken(Object aPrincipal, Object aCredentials, Collection<? extends GrantedAuthority> anAuthorities) {
-        super(aPrincipal, aCredentials, anAuthorities);
+    public AuthenticationWithToken(Object principal, Object credential, Collection<? extends GrantedAuthority> authorities) {
+        super(principal, credential, authorities);
     }
 
     public void setToken(String token) {
@@ -19,6 +20,6 @@ public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken
     }
 
     public String getToken() {
-        return (String)getDetails();
+        return (String) getDetails();
     }
 }

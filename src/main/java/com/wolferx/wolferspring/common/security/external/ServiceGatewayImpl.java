@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.external;
 
 import com.wolferx.wolferspring.controller.samplestuff.ServiceGateway;
 import com.wolferx.wolferspring.entity.User;

@@ -10,7 +10,7 @@ public class User implements Serializable {
     private String username;
     private String password;
     private Integer verified;
-    private Integer access_level;
+    private Integer accessLevel;
     private Integer status;
     private Date lastLogin;
     private Date timeCreated;
@@ -23,14 +23,14 @@ public class User implements Serializable {
     }
 
     public User(Long userId, String email, String username, String password, Integer verified,
-                Integer access_level, Integer status, Date lastLogin, Date timeCreated, Date timeUpdated) {
+                Integer accessLevel, Integer status, Date lastLogin, Date timeCreated, Date timeUpdated) {
 
         this.userId = userId;
         this.email = email;
         this.username = username;
         this.password = password;
         this.verified = verified;
-        this.access_level = access_level;
+        this.accessLevel = accessLevel;
         this.status = status;
         this.lastLogin = lastLogin;
         this.timeCreated = timeCreated;
@@ -81,12 +81,10 @@ public class User implements Serializable {
         this.verified = verified;
     }
 
-    public Integer getAccess_level() {
-        return access_level;
-    }
+    public Integer getAccessLevel() { return accessLevel; }
 
-    public void setAccess_level(Integer access_level) {
-        this.access_level = access_level;
+    public void setAccessLevel(Integer accessLevel) {
+        this.accessLevel = accessLevel;
     }
 
     public Integer getStatus() {

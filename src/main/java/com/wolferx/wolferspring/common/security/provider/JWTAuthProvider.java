@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.common.provider;
+package com.wolferx.wolferspring.common.security.provider;
 
 import com.google.common.base.Optional;
 import com.wolferx.wolferspring.service.TokenService;
@@ -8,11 +8,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-public class TokenAuthProvider implements AuthenticationProvider {
+public class JWTAuthProvider implements AuthenticationProvider {
 
     private TokenService tokenService;
 
-    public TokenAuthProvider(TokenService tokenService) {
+    public JWTAuthProvider(TokenService tokenService) {
         this.tokenService = tokenService;
     }
 
