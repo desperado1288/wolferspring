@@ -39,9 +39,7 @@ public class AppConfig {
     //** DAO
     //***********
     @Bean
-    public PostDao postDao() {
-        return this.appDbi.onDemand(PostDao.class);
-    }
+    public PostDao postDao() { return this.appDbi.onDemand(PostDao.class); }
     @Bean
     public CommentDao commentDao() { return this.appDbi.onDemand(CommentDao.class); }
     @Bean

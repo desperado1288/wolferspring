@@ -1,17 +1,22 @@
 package com.wolferx.wolferspring.config;
 
-import com.wolferx.wolferspring.common.filter.AuthenticationFilter;
-import com.wolferx.wolferspring.common.filter.ManagementEndpointAuthenticationFilter;
-import com.wolferx.wolferspring.common.provider.BackendAdminUsernamePasswordAuthenticationProvider;
-import com.wolferx.wolferspring.common.provider.TokenAuthProvider;
-import com.wolferx.wolferspring.common.provider.UserPasswordAuthProvider;
-import com.wolferx.wolferspring.external.ExternalServiceAuthenticator;
-import com.wolferx.wolferspring.external.SomeExternalServiceAuthenticator;
+import com.wolferx.wolferspring.common.filter.AuthMainFilter;
+import com.wolferx.wolferspring.common.filter.AuthMonitorFilter;
+import com.wolferx.wolferspring.common.security.external.ExternalServiceAuthenticator;
+import com.wolferx.wolferspring.common.security.external.SomeExternalServiceAuthenticator;
+import com.wolferx.wolferspring.common.security.provider.BackendAdminUsernamePasswordAuthenticationProvider;
+import com.wolferx.wolferspring.common.security.provider.JWTAuthProvider;
+import com.wolferx.wolferspring.common.security.provider.PasswordAuthProvider;
+import com.wolferx.wolferspring.service.AuthService;
 import com.wolferx.wolferspring.service.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,6 +24,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -26,63 +33,83 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @Configuration
-//@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 @EnableWebSecurity
-@EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableScheduling
+@Order(ManagementServerProperties.BASIC_AUTH_ORDER - 1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${backend.admin.role}")
     private String backendAdminRole;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private TokenService tokenService;
 
+
+    /***
+     * Config what resources need to be protected
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
         http
-            .csrf()
-                .disable()
-            .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+            .csrf().disable()
             .authorizeRequests()
-                .antMatchers(actuatorEndpoints()).hasRole(backendAdminRole)
-                .anyRequest().permitAll()
-                .and()
+            .antMatchers(actuatorEndpoints()).hasRole(backendAdminRole)
+            .anyRequest().permitAll()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .logout()
+            .logoutUrl(RouteConfig.LOGOUT_URL)
+            .logoutSuccessUrl(RouteConfig.LOGOUT_SUCCESS_URL)
+            .invalidateHttpSession(true)
+            .deleteCookies("JSESSIONID")
+            .and()
             .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedEntryPoint());
-        // @formatter:on
-
-        http.
-            addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class).
-            addFilterBefore(new ManagementEndpointAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class);
+            .authenticationEntryPoint(unauthorizedEntryPoint())
+            .and()
+            .addFilterBefore(new AuthMainFilter(authenticationManager()), BasicAuthenticationFilter.class)
+            .addFilterBefore(new AuthMonitorFilter(authenticationManager()), BasicAuthenticationFilter.class);
     }
 
+    /***
+     * Register authentication provider
+     */
     @Override
-    protected void configure(AuthenticationManagerBuilder authenticationManager) throws Exception {
-        authenticationManager.
-            authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
-            authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
-            authenticationProvider(tokenAuthenticationProvider());
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        // quick auth access
+        authenticationManagerBuilder
+            .inMemoryAuthentication().withUser("dave")
+            .password("secret").roles("USER");
+
+        // custom auth provider
+        authenticationManagerBuilder
+            .authenticationProvider(passwordAuthProvider())
+            .authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider())
+            .authenticationProvider(jwtAuthProvider());
     }
 
     @Bean
-    public TokenService tokenService() {
-        return new TokenService();
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Bean
-    public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
-        return new SomeExternalServiceAuthenticator();
+    public AuthenticationProvider passwordAuthProvider() {
+        return new PasswordAuthProvider(this.authService);
     }
 
     @Bean
-    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
-        return new UserPasswordAuthProvider(tokenService(), someExternalServiceAuthenticator());
+    public AuthenticationProvider jwtAuthProvider() {
+        return new JWTAuthProvider(this.tokenService);
     }
 
-    @Bean
-    public AuthenticationProvider tokenAuthenticationProvider() {
-        return new TokenAuthProvider(tokenService());
+    @Bean(name = "passwordEncoder")
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -91,8 +118,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
+        return new SomeExternalServiceAuthenticator();
+    }
+
+    @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {
-        return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 
     private String[] actuatorEndpoints() {

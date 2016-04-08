@@ -1,7 +1,7 @@
-package com.wolferx.wolferspring.common.provider;
+package com.wolferx.wolferspring.common.security.provider;
 
 import com.google.common.base.Optional;
-import com.wolferx.wolferspring.external.BackendAdminUsernamePasswordAuthenticationToken;
+import com.wolferx.wolferspring.common.security.external.BackendAdminUsernamePasswordAuthenticationToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

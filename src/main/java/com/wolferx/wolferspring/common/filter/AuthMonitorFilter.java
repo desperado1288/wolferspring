@@ -2,7 +2,7 @@ package com.wolferx.wolferspring.common.filter;
 
 import com.google.common.base.Optional;
 import com.wolferx.wolferspring.config.RouteConfig;
-import com.wolferx.wolferspring.external.BackendAdminUsernamePasswordAuthenticationToken;
+import com.wolferx.wolferspring.common.security.external.BackendAdminUsernamePasswordAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ManagementEndpointAuthenticationFilter extends GenericFilterBean {
+public class AuthMonitorFilter extends GenericFilterBean {
 
-    private final static Logger logger = LoggerFactory.getLogger(ManagementEndpointAuthenticationFilter.class);
+    private final static Logger logger = LoggerFactory.getLogger(AuthMonitorFilter.class);
     private AuthenticationManager authenticationManager;
     private Set<String> managementEndpoints;
 
-    public ManagementEndpointAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public AuthMonitorFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         prepareManagementEndpointsSet();
     }
@@ -62,7 +62,7 @@ public class ManagementEndpointAuthenticationFilter extends GenericFilterBean {
                 processManagementEndpointUsernamePasswordAuthentication(username, password);
             }
 
-            logger.debug("ManagementEndpointAuthenticationFilter is passing request down the filter chain");
+            logger.debug("AuthMonitorFilter is passing request down the filter chain");
             chain.doFilter(req, res);
         } catch (AuthenticationException authenticationException) {
             SecurityContextHolder.clearContext();

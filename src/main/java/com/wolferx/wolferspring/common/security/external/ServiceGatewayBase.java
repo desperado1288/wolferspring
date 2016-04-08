@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.external;
 
 public abstract class ServiceGatewayBase {
     private AuthenticatedExternalServiceProvider authenticatedExternalServiceProvider;

@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.external;
 
 import com.wolferx.wolferspring.entity.User;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -18,7 +18,7 @@ public class SomeExternalServiceAuthenticator implements ExternalServiceAuthenti
         // If authentication to external service succeeded then create authenticated wrapper with proper Principal and GrantedAuthorities.
         // GrantedAuthorities may come from external service authentication or be hardcoded at our layer as they are here with ROLE_DOMAIN_USER
         AuthenticatedExternalWebService authenticatedExternalWebService = new AuthenticatedExternalWebService(new User(username), null,
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_DOMAIN_USER"));
+                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
         authenticatedExternalWebService.setExternalWebService(externalWebService);
 
         return authenticatedExternalWebService;

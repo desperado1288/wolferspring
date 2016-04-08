@@ -1,4 +1,4 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.external;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

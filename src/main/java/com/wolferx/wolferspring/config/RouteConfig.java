@@ -6,9 +6,12 @@ public class RouteConfig {
 
     public static final String USER_URL = API_PATH + "/user";
     public static final String POST_URL = API_PATH + "/post";
-    public static final String AUTHENTICATE_URL = API_PATH + "/authenticate";
+    public static final String AUTH_URL = API_PATH + "/auth";
     public static final String STUFF_URL = API_PATH + "/stuff";
 
+    // Logout
+    public static final String LOGOUT_URL = "/logout";
+    public static final String LOGOUT_SUCCESS_URL = "/";
 
     // Spring Boot Actuator services
     public static final String AUTOCONFIG_ENDPOINT = "/autoconfig";

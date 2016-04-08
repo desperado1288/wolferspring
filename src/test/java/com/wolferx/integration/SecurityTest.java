@@ -5,8 +5,8 @@ import com.jayway.restassured.response.ValidatableResponse;
 import com.wolferx.wolferspring.Application;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.controller.samplestuff.ServiceGateway;
-import com.wolferx.wolferspring.external.AuthenticatedExternalWebService;
-import com.wolferx.wolferspring.external.ExternalServiceAuthenticator;
+import com.wolferx.wolferspring.common.security.external.AuthenticatedExternalWebService;
+import com.wolferx.wolferspring.common.security.external.ExternalServiceAuthenticator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -113,7 +113,7 @@ public class SecurityTest {
     @Test
     public void authenticate_withoutPassword_returnsUnauthorized() {
         given().header(X_AUTH_USERNAME, "SomeUser").
-            when().post(RouteConfig.AUTHENTICATE_URL).
+            when().post(RouteConfig.AUTH_URL).
             then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
@@ -122,7 +122,7 @@ public class SecurityTest {
     @Test
     public void authenticate_withoutUsername_returnsUnauthorized() {
         given().header(X_AUTH_PASSWORD, "SomePassword").
-            when().post(RouteConfig.AUTHENTICATE_URL).
+            when().post(RouteConfig.AUTH_URL).
             then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
@@ -130,7 +130,7 @@ public class SecurityTest {
 
     @Test
     public void authenticate_withoutUsernameAndPassword_returnsUnauthorized() {
-        when().post(RouteConfig.AUTHENTICATE_URL).
+        when().post(RouteConfig.AUTH_URL).
             then().statusCode(HttpStatus.UNAUTHORIZED.value());
 
         BDDMockito.verifyNoMoreInteractions(mockedExternalServiceAuthenticator);
@@ -150,7 +150,7 @@ public class SecurityTest {
             thenThrow(new BadCredentialsException("Invalid Credentials"));
 
         given().header(X_AUTH_USERNAME, username).header(X_AUTH_PASSWORD, password).
-            when().post(RouteConfig.AUTHENTICATE_URL).
+            when().post(RouteConfig.AUTH_URL).
             then().statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
@@ -188,7 +188,7 @@ public class SecurityTest {
 
         ValidatableResponse validatableResponse = given().header(X_AUTH_USERNAME, username).
             header(X_AUTH_PASSWORD, password).
-            when().post(RouteConfig.AUTHENTICATE_URL).
+            when().post(RouteConfig.AUTH_URL).
             then().statusCode(HttpStatus.OK.value());
         String generatedToken = authenticationWithToken.getToken();
         validatableResponse.body("token", equalTo(generatedToken));

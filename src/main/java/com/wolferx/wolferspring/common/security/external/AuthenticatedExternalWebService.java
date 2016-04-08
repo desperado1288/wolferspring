@@ -1,5 +1,6 @@
-package com.wolferx.wolferspring.external;
+package com.wolferx.wolferspring.common.security.external;
 
+import com.wolferx.wolferspring.common.security.AuthEntity.AuthenticationWithToken;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;

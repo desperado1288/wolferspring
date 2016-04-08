@@ -29,8 +29,9 @@ public class DatabaseConfig implements TransactionManagementConfigurer {
     @Value("${spring.datasource.password}")
     private String dbPassword;
 
-    @Bean
+
     @ConfigurationProperties(prefix="spring.datasource")
+    @Bean
     public DataSource dataSource() {
         return DataSourceBuilder
             .create()
