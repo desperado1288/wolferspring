@@ -20,12 +20,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserByUserId(Long userId) {
-        return userDao.getUserById(userId);
+        return Optional.of(userDao.getUserById(userId));
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        return userDao.getUserByEmail(email);
+        return Optional.ofNullable(userDao.getUserByEmail(email));
     }
 
     @Override

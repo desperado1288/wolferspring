@@ -2,12 +2,12 @@ package com.wolferx.wolferspring.config;
 
 public class RouteConfig {
 
+    // API
     private static final String API_PATH = "/api/v1";
 
     public static final String USER_URL = API_PATH + "/user";
     public static final String POST_URL = API_PATH + "/post";
     public static final String AUTH_URL = API_PATH + "/auth";
-    public static final String STUFF_URL = API_PATH + "/stuff";
 
     // Logout
     public static final String LOGOUT_URL = "/logout";

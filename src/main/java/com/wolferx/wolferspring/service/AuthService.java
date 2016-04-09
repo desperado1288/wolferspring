@@ -1,8 +1,11 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.security.AuthEntity.AuthenticationWithToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 public interface AuthService {
 
-    AuthenticationWithToken authWithPassword(String email, String password);
+    UsernamePasswordAuthenticationToken authWithPassword(String email, String password);
+
+    PreAuthenticatedAuthenticationToken authWithToken(String token);
 }
