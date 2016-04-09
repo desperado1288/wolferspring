@@ -1,14 +1,8 @@
 package com.wolferx.wolferspring.config;
 
 import com.wolferx.wolferspring.common.filter.AuthMainFilter;
-import com.wolferx.wolferspring.common.filter.AuthMonitorFilter;
-import com.wolferx.wolferspring.common.security.external.ExternalServiceAuthenticator;
-import com.wolferx.wolferspring.common.security.external.SomeExternalServiceAuthenticator;
-import com.wolferx.wolferspring.common.security.provider.BackendAdminUsernamePasswordAuthenticationProvider;
-import com.wolferx.wolferspring.common.security.provider.JWTAuthProvider;
-import com.wolferx.wolferspring.common.security.provider.PasswordAuthProvider;
-import com.wolferx.wolferspring.service.AuthService;
-import com.wolferx.wolferspring.service.TokenService;
+import com.wolferx.wolferspring.common.security.JWTAuthProvider;
+import com.wolferx.wolferspring.common.security.PasswordAuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
@@ -17,15 +11,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -39,13 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 @Order(ManagementServerProperties.BASIC_AUTH_ORDER - 1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${backend.admin.role}")
-    private String backendAdminRole;
+    @Value("${monitor.admin.role}")
+    private String monitorAdminRole;
     @Autowired
-    private AuthService authService;
+    private PasswordAuthProvider passwordAuthProvider;
     @Autowired
-    private TokenService tokenService;
-
+    private JWTAuthProvider jwtAuthProvider;
 
     /***
      * Config what resources need to be protected
@@ -55,11 +45,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers(actuatorEndpoints()).hasRole(backendAdminRole)
-            .anyRequest().permitAll()
+            .antMatchers(actuatorEndpoints()).hasRole(monitorAdminRole)
+            .anyRequest().authenticated()
             .and()
             .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
             .and()
             .logout()
             .logoutUrl(RouteConfig.LOGOUT_URL)
@@ -70,8 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling()
             .authenticationEntryPoint(unauthorizedEntryPoint())
             .and()
-            .addFilterBefore(new AuthMainFilter(authenticationManager()), BasicAuthenticationFilter.class)
-            .addFilterBefore(new AuthMonitorFilter(authenticationManager()), BasicAuthenticationFilter.class);
+            .addFilterBefore(new AuthMainFilter(authenticationManager()), BasicAuthenticationFilter.class);
     }
 
     /***
@@ -79,16 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        // quick auth access
-        authenticationManagerBuilder
-            .inMemoryAuthentication().withUser("dave")
-            .password("secret").roles("USER");
-
         // custom auth provider
         authenticationManagerBuilder
-            .authenticationProvider(passwordAuthProvider())
-            .authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider())
-            .authenticationProvider(jwtAuthProvider());
+            .authenticationProvider(passwordAuthProvider)
+            .authenticationProvider(jwtAuthProvider);
     }
 
     @Bean
@@ -98,41 +81,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationProvider passwordAuthProvider() {
-        return new PasswordAuthProvider(this.authService);
-    }
-
-    @Bean
-    public AuthenticationProvider jwtAuthProvider() {
-        return new JWTAuthProvider(this.tokenService);
-    }
-
-    @Bean(name = "passwordEncoder")
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationProvider backendAdminUsernamePasswordAuthenticationProvider() {
-        return new BackendAdminUsernamePasswordAuthenticationProvider();
-    }
-
-    @Bean
-    public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
-        return new SomeExternalServiceAuthenticator();
-    }
-
-    @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {
         return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 
     private String[] actuatorEndpoints() {
-
         return new String[]{
-            RouteConfig.AUTOCONFIG_ENDPOINT, RouteConfig.BEANS_ENDPOINT,
-            RouteConfig.CONFIGPROPS_ENDPOINT, RouteConfig.ENV_ENDPOINT,
-            RouteConfig.MAPPINGS_ENDPOINT, RouteConfig.METRICS_ENDPOINT,
+            RouteConfig.AUTOCONFIG_ENDPOINT, RouteConfig.BEANS_ENDPOINT, RouteConfig.CONFIGPROPS_ENDPOINT,
+            RouteConfig.ENV_ENDPOINT, RouteConfig.MAPPINGS_ENDPOINT, RouteConfig.METRICS_ENDPOINT,
             RouteConfig.SHUTDOWN_ENDPOINT};
     }
 }

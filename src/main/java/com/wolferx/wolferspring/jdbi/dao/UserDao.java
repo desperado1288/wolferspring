@@ -6,15 +6,13 @@ import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
-import java.util.Optional;
-
 @RegisterMapper(UserMapper.class)
 public abstract class UserDao {
 
     @SqlQuery("SELECT * FROM user WHERE user_id = :user_id")
-    public abstract Optional<User> getUserById(@Bind("user_id") final Long userId);
+    public abstract User getUserById(@Bind("user_id") final Long userId);
 
     @SqlQuery("SELECT * FROM user WHERE email = :email")
-    public abstract Optional<User> getUserByEmail(@Bind("email") final String email);
+    public abstract User getUserByEmail(@Bind("email") final String email);
 
 }

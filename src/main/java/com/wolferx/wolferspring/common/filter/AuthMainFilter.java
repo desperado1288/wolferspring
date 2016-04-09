@@ -10,7 +10,6 @@ import org.slf4j.MDC;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -31,20 +30,20 @@ import java.util.Optional;
 
 public class AuthMainFilter extends GenericFilterBean {
 
+    private final static Logger logger = LoggerFactory.getLogger(AuthMainFilter.class);
+
     public final static String TOKEN_SESSION_KEY = "token";
     public final static String USER_SESSION_KEY = "user";
 
-    private final static Logger logger = LoggerFactory.getLogger(AuthMainFilter.class);
-
     private AuthenticationManager authManager;
 
-    public AuthMainFilter(AuthenticationManager authManager) {
+    public AuthMainFilter(final AuthenticationManager authManager) {
         this.authManager = authManager;
     }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-        throws IOException, ServletException {
+        throws IOException, ServletException, AuthenticationException {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
@@ -63,17 +62,18 @@ public class AuthMainFilter extends GenericFilterBean {
                 final String email = inputEmail.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
                 final String password = inputPassword.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
 
-                logger.debug("Trying to authenticate user: {}", email);
+                logger.info("<Start> Authenticate user with password. User: {}", email);
                 final UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
-                final Authentication authResult = authManager.authenticate(authRequest);
-                if (authResult == null || !authResult.isAuthenticated()) {
+                final Authentication authentication = authManager.authenticate(authRequest);
+                if (authentication == null || !authentication.isAuthenticated()) {
+                    logger.error("<In> AuthMainFilter failed to authenticate User with password. User: {}", email);
                     throw new AuthenticationServiceException("Unable to authenticate User with provided credentials");
                 }
-                logger.debug("User successfully authenticated");
+                logger.info("<End> Authenticated with password. User: {}", email);
 
-                SecurityContextHolder.getContext().setAuthentication(authResult);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                final TokenResponse tokenResponse = new TokenResponse(authResult.getDetails().toString());
+                final TokenResponse tokenResponse = new TokenResponse(authentication.getDetails().toString());
                 final String tokenJsonResponse = new ObjectMapper().writeValueAsString(tokenResponse);
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -88,32 +88,36 @@ public class AuthMainFilter extends GenericFilterBean {
              ***********/
             if (inputToken.isPresent()) {
 
-                final String token = inputToken.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
-
-                logger.debug("Trying to authenticate user by X-Auth-Token method. Token: {}", token);
-                PreAuthenticatedAuthenticationToken requestAuthentication = new PreAuthenticatedAuthenticationToken(token, null);
-                Authentication authResult = authManager.authenticate(requestAuthentication);
-                if (authResult == null || !authResult.isAuthenticated()) {
-                    throw new InternalAuthenticationServiceException("Unable to authenticate User for provided credentials");
+                logger.debug("<Start> Authenticate user with token");
+                final String token = inputToken.get();
+                final PreAuthenticatedAuthenticationToken authRequest = new PreAuthenticatedAuthenticationToken(token, null);
+                final Authentication authentication = authManager.authenticate(authRequest);
+                if (authentication == null || !authentication.isAuthenticated()) {
+                    logger.error("<In> AuthMainFilter failed to authenticate User with token");
+                    throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
                 }
-                logger.debug("User successfully authenticated");
+                logger.debug("<End> Authenticate user with token");
 
-                SecurityContextHolder.getContext().setAuthentication(authResult);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
+            // add context to Mapped Diagnostic Context log
+            addSessionContextToLogging();
+
             /**********
-             / if neither password and token are presented
-             / then pass request down to the filter chain
+             / if: neither password and token are presented
+             / then: pass request down to the filter chain
              ***********/
             logger.debug("AuthMainFilter is passing request down the filter chain");
-            addSessionContextToLogging();
             chain.doFilter(req, res);
-        } catch (InternalAuthenticationServiceException internalAuthenticationServiceException) {
+
+        } catch (AuthenticationServiceException authenticationServiceException) {
             SecurityContextHolder.clearContext();
-            logger.error("Internal authentication service exception", internalAuthenticationServiceException);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            logger.error("Authentication service exception", authenticationServiceException);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authenticationServiceException.getMessage());
         } catch (AuthenticationException authenticationException) {
             SecurityContextHolder.clearContext();
+            logger.error("Authentication exception", authenticationException);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authenticationException.getMessage());
         } finally {
             MDC.remove(TOKEN_SESSION_KEY);
@@ -122,10 +126,10 @@ public class AuthMainFilter extends GenericFilterBean {
     }
 
     private void addSessionContextToLogging() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String tokenValue = "EMPTY";
         if (authentication != null && !Strings.isNullOrEmpty(authentication.getDetails().toString())) {
-            MessageDigestPasswordEncoder encoder = new MessageDigestPasswordEncoder("SHA-1");
+            final MessageDigestPasswordEncoder encoder = new MessageDigestPasswordEncoder("SHA-1");
             tokenValue = encoder.encodePassword(authentication.getDetails().toString(), "not_so_random_salt");
         }
         MDC.put(TOKEN_SESSION_KEY, tokenValue);
