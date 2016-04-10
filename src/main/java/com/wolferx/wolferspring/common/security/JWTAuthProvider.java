@@ -14,19 +14,19 @@ public class JWTAuthProvider implements AuthenticationProvider {
     private AuthService authService;
 
     @Autowired
-    public JWTAuthProvider(AuthService authService) {
+    public JWTAuthProvider(final AuthService authService) {
         this.authService = authService;
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws InternalAuthenticationServiceException {
+    public Authentication authenticate(final Authentication authentication) throws InternalAuthenticationServiceException {
 
         final String token = (String) authentication.getPrincipal();
         return authService.authWithToken(token);
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    public boolean supports(final Class<?> authentication) {
         return authentication.equals(PreAuthenticatedAuthenticationToken.class);
     }
 }

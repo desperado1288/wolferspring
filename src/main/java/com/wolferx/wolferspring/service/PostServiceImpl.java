@@ -1,6 +1,6 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageException;
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import org.skife.jdbi.v2.DBI;
@@ -27,7 +27,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag)
-            throws StorageException {
+            throws StorageServiceException {
 
         final Integer status = 1;
         final Date timeCreated, timeUpdated;
@@ -38,7 +38,7 @@ public class PostServiceImpl implements PostService {
             post = this.postDao.createPost(userId, title, body, postCoverUrl, type, musicids, slug, tag, status, timeCreated, timeUpdated);
 
         } catch (final DBIException error) {
-            throw new StorageException(
+            throw new StorageServiceException(
                     String.format("Error: [createPost] service for user: '%s' ", userId), error);
         }
 
@@ -67,24 +67,24 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag)
-            throws StorageException{
+            throws StorageServiceException {
         final Date timeUpdated = new Date();
         Post post;
         try {
             post = this.postDao.update(postId, title, body, postCoverUrl, type, musicIds, slug, tag, timeUpdated);
         } catch (final DBIException error) {
-            throw new StorageException(String.format("Error: [updatePost] service for post: '%s' ", postId), error);
+            throw new StorageServiceException(String.format("Error: [updatePost] service for post: '%s' ", postId), error);
         }
 
         return post;
     }
 
     @Override
-    public void deleteById(Long postId) throws StorageException {
+    public void deleteById(Long postId) throws StorageServiceException {
         try {
             this.postDao.deletePost(postId);
         } catch (final DBIException error) {
-            throw new StorageException(String.format("Error: [deletePost] service for post: '%s' ", postId), error);
+            throw new StorageServiceException(String.format("Error: [deletePost] service for post: '%s' ", postId), error);
         }
     }
 

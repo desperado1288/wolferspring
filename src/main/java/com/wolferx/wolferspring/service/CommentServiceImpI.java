@@ -1,6 +1,6 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageException;
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.jdbi.dao.CommentDao;
 import org.skife.jdbi.v2.DBI;
@@ -28,7 +28,7 @@ public class CommentServiceImpI implements CommentService {
 
     @Override
     public Comment createComment(Long user_id, Long post_id, Long music_id, String comment_body)
-        throws StorageException {
+        throws StorageServiceException {
         final Integer status = STATUS_ACTIVE;
         final Date timeUpdated, timeCreated;
         timeCreated = timeUpdated = new Date();
@@ -37,7 +37,7 @@ public class CommentServiceImpI implements CommentService {
         try {
             comment = this.commentDao.createComment(user_id, post_id, music_id, comment_body, status, timeUpdated, timeCreated);
         } catch (final DBIException error) {
-            throw new StorageException(
+            throw new StorageServiceException(
                 String.format("Error: [createComment] service for post: '%s' ", post_id), error);
         }
         return comment;
@@ -81,12 +81,12 @@ public class CommentServiceImpI implements CommentService {
     }
 
     @Override
-    public void deleteById(Long comment_id) throws StorageException {
+    public void deleteById(Long comment_id) throws StorageServiceException {
 
         try {
             this.commentDao.delete(comment_id);
         } catch(final DBIException error) {
-            throw new StorageException(String.format("Error: [deleteComment] service for comment: '%s' ", comment_id), error);
+            throw new StorageServiceException(String.format("Error: [deleteComment] service for comment: '%s' ", comment_id), error);
         }
     }
 }

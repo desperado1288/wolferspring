@@ -1,5 +1,7 @@
 package com.wolferx.wolferspring.common.filter;
 
+import com.wolferx.wolferspring.common.constant.Constant;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -14,27 +16,25 @@ public class CorsFilter implements Filter {
     FilterConfig filterConfig;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+    public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
         throws IOException, ServletException {
 
-        HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        final HttpServletResponse response = (HttpServletResponse) res;
+        response.setHeader("Access-Control-Allow-Origin", Constant.ACCESS_CONTROL_ALLOW_ORIGIN);
+        response.setHeader("Access-Control-Allow-Methods", Constant.ACCESS_CONTROL_ALLOW_METHODS);
+        response.setHeader("Access-Control-Max-Age", Constant.ACCESS_CONTROL_MAX_AGE);
+        response.setHeader("Access-Control-Allow-Headers", Constant.ACCESS_CONTROL_ALLOW_HEADERS);
         chain.doFilter(req, response);
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
         this.filterConfig = filterConfig;
         filterConfig.getServletContext().log("Initializing CorsFilter ...");
     }
 
     @Override
     public void destroy() {
-
         filterConfig.getServletContext().log("Destroying CorsFilter ...");
     }
 }

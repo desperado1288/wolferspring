@@ -9,5 +9,4 @@ public interface TokenService {
 
     Map<String, Object> verifyToken (final String token);
 
-
 }

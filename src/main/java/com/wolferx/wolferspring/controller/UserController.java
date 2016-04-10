@@ -1,6 +1,6 @@
 package com.wolferx.wolferspring.controller;
 
-import com.wolferx.wolferspring.common.exception.BaseException;
+import com.wolferx.wolferspring.common.exception.BaseServiceException;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.service.UserService;
@@ -26,33 +26,31 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(final UserService userService) {
         this.userService = userService;
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
     public User getUserByUserId(@PathVariable("userId") Long userId)
-        throws BaseException {
+        throws BaseServiceException {
 
-        logger.info("Start getUserByUserId() for userId: " + userId);
-
+        logger.info("<Start> getUserByUserId() : UserId: {}", userId);
         final User user =  userService.getUserByUserId(userId)
-            .orElseThrow(() -> new NoSuchElementException(String.format("User=%s not found", userId)));
+            .orElseThrow(() -> new NoSuchElementException(String.format("User : %s not found", userId)));
+        logger.info("<End> getUserByUserId() : UserId: {}", userId);
 
-        logger.info("End getUserByUserId() for userId: " + userId);
         return user;
     }
 
     @RequestMapping(value = "/{email}", method = RequestMethod.GET)
     public User getUserByEmail(@PathVariable("email") String email)
-        throws BaseException {
+        throws BaseServiceException {
 
-        logger.info("Start getUserByEmail() for email: " + email);
-
+        logger.info("<Start> getUserByEmail() : Email: {}", email);
         final User user =  userService.getUserByEmail(email)
-            .orElseThrow(() -> new NoSuchElementException(String.format("User=%s not found", email)));
+            .orElseThrow(() -> new NoSuchElementException(String.format("User : %s not found", email)));
+        logger.info("<End> getUserByEmail() : Email: {}", email);
 
-        logger.info("End getUserByEmail() for email: " + email);
         return user;
     }
 }

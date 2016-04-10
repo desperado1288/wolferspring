@@ -8,7 +8,6 @@ import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
 import java.util.Date;
@@ -20,7 +19,6 @@ public abstract class PostDao {
     @SqlUpdate(
         "INSERT INTO post (user_id, post_title, post_body, post_cover_url, type, music_ids, slug, tag, status, time_created, time_updated) " +
         "VALUES (:user_id, :post_title, :post_body, :post_cover_url, :type, :music_ids, :slug, :tag, :status, :time_created, :time_updated)")
-    @Mapper(PostMapper.class)
     @GetGeneratedKeys
     public abstract Long insertPost(
         @Bind("user_id") final Long userId,
