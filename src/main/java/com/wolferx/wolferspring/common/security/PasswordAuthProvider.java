@@ -14,7 +14,7 @@ public class PasswordAuthProvider implements AuthenticationProvider {
     private AuthService authService;
 
     @Autowired
-    public PasswordAuthProvider(AuthService authService) {
+    public PasswordAuthProvider(final AuthService authService) {
         this.authService = authService;
     }
 
@@ -29,7 +29,7 @@ public class PasswordAuthProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    public boolean supports(final Class<?> authentication) {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }

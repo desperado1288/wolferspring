@@ -3,7 +3,7 @@ package com.wolferx.wolferspring.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.wolferx.wolferspring.common.CommonUtil;
 import com.wolferx.wolferspring.common.annotation.LoggedUser;
-import com.wolferx.wolferspring.common.exception.BaseException;
+import com.wolferx.wolferspring.common.exception.BaseServiceException;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.Post;
 import com.wolferx.wolferspring.entity.User;
@@ -26,60 +26,43 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ROLE_USER')")
 @RequestMapping(value = RouteConfig.POST_URL, produces = {MediaType.APPLICATION_JSON_VALUE})
 public class PostController {
+
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
     private final PostService postService;
 
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(final PostService postService) {
         this.postService = postService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Post> getAllPost()
-        throws BaseException {
+        throws BaseServiceException {
 
-        logger.info("Start getAllPost()");
+        logger.info("<Start> getAllPost()");
         final List<Post> posts = postService.findAll(false);
-
-        logger.info("End getAllPost()");
+        logger.info("<End> getAllPost()");
 
         return posts;
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.GET)
-    public Post getPostByUserId(@PathVariable("postId") Long postId)
-        throws BaseException {
+    public Post getPostByUserId(@PathVariable("postId") final Long postId)
+        throws BaseServiceException {
 
-        logger.info("Start getPostById() for postId: " + postId);
-
+        logger.info("<Start> getPostById() : PostId: " + postId);
         final Post post =  postService.findById(postId);
-        logger.info("End getPostByUserId() for postId: " + postId);
+        logger.info("<End> getPostByUserId() : PostId: " + postId);
+
         return post;
     }
 
-    /*
-    @RequestMapping(method = RequestMethod.GET)
-    public Map<String, Object> getPostByUserId(@RequestParam("userId") Long userId) {
-
-        logger.info("Start getPostByUserId() for userId: " + userId);
-
-        List<Post> posts =  postService.findByUserId(userId);
-
-        Map<String, Object> response = new LinkedHashMap<String, Object>();
-        response.put("message", "get all posts by userId: " + userId);
-        response.put("posts", posts);
-
-        logger.info("End getPostByUserId() for userId: " + userId);
-        return response;
-    }
-    */
-
     @RequestMapping(method = RequestMethod.POST)
     public Post createPost(@RequestBody JSONObject requestBody,  @LoggedUser User user)
-        throws BaseException {
+        throws BaseServiceException {
 
-        logger.info("Start createPost()");
+        logger.info("<Start> createPost()");
         final Long userId = requestBody.getInteger("userId").longValue();
         final String title = requestBody.getString("postTitle");
         final String body = requestBody.getString("postBody");
@@ -89,16 +72,14 @@ public class PostController {
         final String slug = requestBody.getString("slug");
         final String tag = requestBody.getString("tag");
 
-        Post post = postService.createPost(userId, title, body, postCoverUrl, type, musicIds, slug, tag);
-        logger.info("End createPost()");
+        final Post post = postService.createPost(userId, title, body, postCoverUrl, type, musicIds, slug, tag);
+        logger.info("<End> createPost()");
         return post;
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     public Post updatePost(@RequestBody JSONObject requestBody)
-        throws BaseException {
-
-        logger.info("Initialize updatePost()");
+        throws BaseServiceException {
 
         final JSONObject requestParams = requestBody.getJSONObject("post");
 
@@ -131,20 +112,21 @@ public class PostController {
         }
         Integer type = CommonUtil.isNullEmpty(musicIds) ? Post.TYPE_TEXT_POST : Post.TYPE_MUSIC_POST;
 
-        logger.info("Start updatePost() by postId: " + postId);
-        Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
-        logger.info("End updatePost() by postId: " + postId);
+        logger.info("<Start> updatePost() : PostId: " + postId);
+        final Post post = postService.updateById(postId, title, body, postCoverUrl, type, musicIds, slug, tag);
+        logger.info("<End> updatePost() : PostId: " + postId);
 
         return post;
     }
 
     @RequestMapping(value="/{postId}", method = RequestMethod.DELETE)
-    public String deletePost(@PathVariable("postId") Long postId)
-        throws BaseException {
-        logger.info("Start deletePost() for postId: " + postId);
+    public String deletePost(@PathVariable("postId") final Long postId)
+        throws BaseServiceException {
 
+        logger.info("<Start> deletePost() : postId: {}", postId);
         postService.deleteById(postId);
-        logger.info("End deletePost() for postId: " + postId);
+        logger.info("<End> deletePost() : postId: {}", postId);
+
         return "deleted successfully";
     }
 }

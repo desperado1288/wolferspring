@@ -1,6 +1,9 @@
 package com.wolferx.wolferspring.service;
 
+import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.constant.Role;
+import com.wolferx.wolferspring.common.exception.BaseServiceException;
+import com.wolferx.wolferspring.common.exception.InsertItemAlreadyExistException;
 import com.wolferx.wolferspring.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +33,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UsernamePasswordAuthenticationToken authWithPassword(final String email, final String password) {
+    public UsernamePasswordAuthenticationToken registerUser(final String email, final String password)
+        throws BaseServiceException{
 
+        // if: user already exist
+        if (userService.getUserByEmail(email).isPresent()) {
+            throw new InsertItemAlreadyExistException("Registering User has already exist");
+        }
+
+        final String salt = BCrypt.gensalt(Constant.AUTH_JWT_SALT_LENGTH).concat(Constant.AUTH_JWT_SECRET);
+        final String hash = BCrypt.hashpw(password, salt);
+        final User user = userService.createUser(email, hash);
+
+        return authWithUser(user);
+    }
+
+    @Override
+    public UsernamePasswordAuthenticationToken authWithPassword(final String email, final String hashedPassword) {
         logger.info("<Start> authWithPassword() User: {}", email);
+
         // verify user existence
         final User user = userService.getUserByEmail(email)
             .orElseThrow(() -> {
@@ -40,13 +60,13 @@ public class AuthServiceImpl implements AuthService {
             });
 
         // verify user password
-        if (!password.equals(user.getPassword())) {
+        if (!hashedPassword.equals(user.getPassword())) {
             logger.info("<In> authWithPassword() Invalid password for User: {}", email);
             throw new AuthenticationServiceException("Unable to authenticate User with provided credentials");
         }
 
         // grant user roles
-        UsernamePasswordAuthenticationToken authentication;
+        final UsernamePasswordAuthenticationToken authentication;
         if (user.getAccessLevel().equals(Role.ADMIN.getValue())) {
             authentication = new UsernamePasswordAuthenticationToken(user, null,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(Role.ADMIN.toString()));
@@ -65,7 +85,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public PreAuthenticatedAuthenticationToken authWithToken(final String token) {
-
         logger.debug("<Start> authWithToken()");
 
         // verify token
@@ -87,10 +106,10 @@ public class AuthServiceImpl implements AuthService {
             });
 
         // set authentication
-        PreAuthenticatedAuthenticationToken authentication;
+        final PreAuthenticatedAuthenticationToken authentication;
         if (user.getAccessLevel().equals(Role.ADMIN.getValue())) {
             authentication = new PreAuthenticatedAuthenticationToken(user, null,
-                AuthorityUtils.commaSeparatedStringToAuthorityList(Role.ADMIN.toString()));
+                AuthorityUtils.commaSeparatedStringToAuthorityList(Role.USER_AND_ADMIN.toString()));
         } else {
             authentication = new PreAuthenticatedAuthenticationToken(user, null,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(Role.USER.toString()));
@@ -99,6 +118,28 @@ public class AuthServiceImpl implements AuthService {
         authentication.setDetails(token);
 
         logger.debug("<End> authWithToken()");
+        return authentication;
+    }
+
+    @Override
+    public UsernamePasswordAuthenticationToken authWithUser(final User user) {
+        logger.debug("<Start> authWithUser()");
+
+        // grant user roles
+        final UsernamePasswordAuthenticationToken authentication;
+        if (user.getAccessLevel().equals(Role.ADMIN.getValue())) {
+            authentication = new UsernamePasswordAuthenticationToken(user, null,
+                AuthorityUtils.commaSeparatedStringToAuthorityList(Role.USER_AND_ADMIN.toString()));
+        } else {
+            authentication = new UsernamePasswordAuthenticationToken(user, null,
+                AuthorityUtils.commaSeparatedStringToAuthorityList(Role.USER.toString()));
+        }
+
+        // set token
+        final String token = tokenService.signToken(user.getUserId());
+        authentication.setDetails(token);
+
+        logger.debug("<End> authWithUser()");
         return authentication;
     }
 }

@@ -26,7 +26,7 @@ public class Application {
 
         ConfigurableApplicationContext applicationContext = SpringApplication.run(Application.class, args);
 
-        logger.info("Let's inspect the beans provided by Spring Boot:");
+        logger.info("Listing the beans provided by Spring Boot:");
 
         String[] beanNames = applicationContext.getBeanDefinitionNames();
         Arrays.sort(beanNames);
@@ -36,8 +36,7 @@ public class Application {
     }
 
     @Bean
-    public StartupRunner scheduleRunner() {
-
+    public StartupRunner startupRunner() {
         return new StartupRunner();
     }
 

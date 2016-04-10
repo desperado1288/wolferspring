@@ -5,6 +5,7 @@ import com.wolferx.wolferspring.jdbi.dao.CommentDao;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
 import com.wolferx.wolferspring.jdbi.dao.UserDao;
 import org.skife.jdbi.v2.DBI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
@@ -26,12 +27,12 @@ public class AppConfig {
     //** CORS
     //***********
     @Bean
-    public FilterRegistrationBean myFilter() {
-        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-        Filter corsFilter = new CorsFilter();
+    public FilterRegistrationBean corsFilter() {
+        final FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
+        final Filter corsFilter = new CorsFilter();
         beanFactory.autowireBean(corsFilter);
         filterRegistration.setFilter(corsFilter);
-        filterRegistration.addUrlPatterns("*");
+        filterRegistration.addUrlPatterns("/*");
         return filterRegistration;
     }
 

@@ -3,7 +3,6 @@ package com.wolferx.wolferspring.config;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -19,18 +18,13 @@ public class DatabaseConfig implements TransactionManagementConfigurer {
 
     @Value("${spring.datasource.driver-class-name}")
     private String dbDriver;
-
     @Value("${spring.datasource.url}")
     private String dbUrl;
-
     @Value("${spring.datasource.username}")
     private String dbUsername;
-
     @Value("${spring.datasource.password}")
     private String dbPassword;
 
-
-    @ConfigurationProperties(prefix="spring.datasource")
     @Bean
     public DataSource dataSource() {
         return DataSourceBuilder

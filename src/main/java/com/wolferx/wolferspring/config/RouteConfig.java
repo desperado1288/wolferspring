@@ -13,7 +13,7 @@ public class RouteConfig {
     public static final String LOGOUT_URL = "/logout";
     public static final String LOGOUT_SUCCESS_URL = "/";
 
-    // Spring Boot Actuator services
+    // Spring Boot Actuator Services
     public static final String AUTOCONFIG_ENDPOINT = "/autoconfig";
     public static final String BEANS_ENDPOINT = "/beans";
     public static final String CONFIGPROPS_ENDPOINT = "/configprops";

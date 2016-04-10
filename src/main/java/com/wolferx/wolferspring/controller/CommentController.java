@@ -2,7 +2,7 @@ package com.wolferx.wolferspring.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.wolferx.wolferspring.common.exception.BaseException;
+import com.wolferx.wolferspring.common.exception.BaseServiceException;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.service.CommentService;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class CommentController {
     private CommentService commentService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Comment> getAllComment() throws BaseException {
+    public List<Comment> getAllComment() throws BaseServiceException {
 
         logger.info("Start getAllComment()");
 
@@ -40,7 +40,7 @@ public class CommentController {
 
     @RequestMapping(value = "/{post_id}", method = RequestMethod.GET)
     public List<Comment> getCommentByPostId(@PathVariable("post_id") Long post_id)
-        throws BaseException {
+        throws BaseServiceException {
 
         logger.info("Start getCommentByPostId for postId: " + post_id);
 
@@ -53,7 +53,7 @@ public class CommentController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Comment createComment(@RequestBody JSONObject requestBody)
-        throws BaseException {
+        throws BaseServiceException {
 
         logger.info("Start createComment()");
 
@@ -71,7 +71,7 @@ public class CommentController {
 
     @RequestMapping(method = RequestMethod.PUT)
     public Comment updateComment(@RequestBody JSONObject requestBody)
-        throws BaseException {
+        throws BaseServiceException {
 
         logger.info("Initilize updateComment()");
 
@@ -98,7 +98,7 @@ public class CommentController {
 
     @RequestMapping(value = "/{comment_id}", method = RequestMethod.DELETE)
     public String deleteComment(@PathVariable("comment_id") Long comment_id)
-        throws BaseException {
+        throws BaseServiceException {
 
         logger.info("Start deleteComment() for comment_id: " + comment_id);
 
