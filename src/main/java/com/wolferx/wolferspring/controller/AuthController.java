@@ -48,4 +48,21 @@ public class AuthController {
 
         return new TokenResponse(authentication.getDetails().toString());
     }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public TokenResponse loginUser(@RequestBody final JsonNode requestBody)
+        throws IOException, BaseServiceException {
+
+        // required input
+        final String email = (String) CommonUtils.parserJsonNode("email", requestBody, String.class, logger);
+        final String password = (String) CommonUtils.parserJsonNode("password", requestBody, String.class, logger);
+
+        // register user
+        logger.info("<Start> loginUser(): for User: {} ", email);
+        final Authentication authentication = authService.authByPassword(email, password);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        logger.info("<End> loginUser(): for User: {}", email);
+
+        return new TokenResponse(authentication.getDetails().toString());
+    }
 }

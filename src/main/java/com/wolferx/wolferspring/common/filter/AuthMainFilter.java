@@ -1,21 +1,15 @@
 package com.wolferx.wolferspring.common.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wolferx.wolferspring.common.constant.Constant;
-import com.wolferx.wolferspring.common.response.TokenResponse;
-import com.wolferx.wolferspring.config.RouteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -42,16 +36,18 @@ public class AuthMainFilter extends GenericFilterBean {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
-        final String resourcePath = new UrlPathHelper().getPathWithinApplication(request);
-        final Optional<String> inputEmail = Optional.ofNullable(request.getHeader(Constant.AUTH_USERNAME_HEADER));
-        final Optional<String> inputPassword = Optional.ofNullable(request.getHeader(Constant.AUTH_PASSWORD_HEADER));
         final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_HEADER));
 
         try {
             /**
              * call: username password authentication
              * when: post request to /api/v1/auth
+             * deprecated: using /api/v1/auth/login to authenticate user
              */
+            /*
+            final String resourcePath = new UrlPathHelper().getPathWithinApplication(request);
+            final Optional<String> inputEmail = Optional.ofNullable(request.getHeader(Constant.AUTH_USERNAME_HEADER));
+            final Optional<String> inputPassword = Optional.ofNullable(request.getHeader(Constant.AUTH_PASSWORD_HEADER));
             if (RouteConfig.AUTH_URL.equalsIgnoreCase(resourcePath) && request.getMethod().equals("POST")) {
 
                 final String email = inputEmail.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
@@ -76,6 +72,7 @@ public class AuthMainFilter extends GenericFilterBean {
                 response.getWriter().print(tokenJsonResponse);
                 return;
             }
+            */
 
             /**
              * call: JWT authentication

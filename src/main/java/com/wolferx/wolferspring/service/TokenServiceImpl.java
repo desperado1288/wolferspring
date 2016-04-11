@@ -24,7 +24,9 @@ public class TokenServiceImpl implements TokenService {
     private static final JWTSigner jwtSigner = new JWTSigner(Constant.AUTH_JWT_SECRET);
     private static final JWTVerifier jwtVerifier = new JWTVerifier(Constant.AUTH_JWT_SECRET);
     private static final JWTSigner.Options jwtOptions = new JWTSigner.Options()
-        .setExpirySeconds(Constant.AUTH_JWT_TOKEN_EXPIRE).setNotValidBeforeLeeway(5).setIssuedAt(true).setJwtId(true);
+        .setExpirySeconds(Constant.AUTH_JWT_TOKEN_EXPIRE)
+        .setNotValidBeforeLeeway(5).setIssuedAt(true)
+        .setJwtId(true);
 
     @Override
     public String signToken (final Long userId ) {
