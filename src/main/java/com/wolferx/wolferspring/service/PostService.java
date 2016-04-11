@@ -1,21 +1,20 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.entity.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostService {
 
-    Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicIds, String tag, String slug) throws StorageServiceException;
+    List<Post> getAllPost(Integer status);
 
-    List<Post> findAll(boolean all);
+    Optional<Post> getPostById(Long postId);
 
+    Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicIds, String tag, String slug);
 
-    Post findById(Long postId);
+    Post updatePostById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag);
 
-    Post updateById(Long postId, String title, String body, String postCoverUrl, Integer type, String musicIds, String slug, String tag) throws StorageServiceException;
-
-    void deleteById(Long postId) throws StorageServiceException;
+    void deletePostById(Long postId);
 
 }

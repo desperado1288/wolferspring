@@ -7,7 +7,6 @@ import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.Transaction;
-import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
 import java.util.Date;
@@ -21,59 +20,49 @@ public abstract class CommentDao {
             "VALUES (:user_id, :post_id, :music_id, :comment_body, :status, :time_created, :time_updated)")
     @GetGeneratedKeys
     public abstract Long insert(
-        @Bind("user_id") final Long user_id,
-        @Bind("post_id") final Long post_id,
-        @Bind("music_id") final Long music_id,
-        @Bind("comment_body") final String comment_body,
+        @Bind("user_id") final Long userId,
+        @Bind("post_id") final Long postId,
+        @Bind("music_id") final Long musicId,
+        @Bind("comment_body") final String commentBody,
         @Bind("status") final Integer status,
-        @Bind("time_created") final Date time_created,
-        @Bind("time_updated") final Date time_updated
+        @Bind("time_created") final Date timeCreated,
+        @Bind("time_updated") final Date timeUpdated
     );
 
     @SqlUpdate("UPDATE comment SET music_id = :music_id, comment_body = :comment_body WHERE comment_id = :comment_id")
-    public abstract void update(
-        @Bind("comment_id") final Long comment_id,
-        @Bind("music_id") final Long music_id,
-        @Bind("comment_body") final String comment_body
+    public abstract void updateComment(
+        @Bind("comment_id") final Long commentId,
+        @Bind("music_id") final Long musicId,
+        @Bind("comment_body") final String commentBody
     );
 
     @SqlUpdate("UPDATE comment SET status = 0 WHERE comment_id = :comment_id")
-    public abstract void delete(@Bind("comment_id") final Long comment_id);
+    public abstract void delete(@Bind("comment_id") final Long commentId);
 
-    @SqlQuery("SELECT * FROM comment")
-    public abstract List<Comment> findAll();
+    @SqlQuery("SELECT * FROM comment WHERE status = :status")
+    public abstract List<Comment> getAll(@Bind("status") final Integer status);
 
     @SqlQuery("SELECT * FROM comment WHERE comment_id = :comment_id")
-    public abstract Comment findByCommentId(@Bind("comment_id") final Long comment_id);
+    public abstract Comment getById(@Bind("comment_id") final Long commentId);
 
-    @SqlQuery("SELECT * FROM comment WHERE status = 1")
-    public abstract List<Comment> findAllValid();
-
-    @SqlQuery("SELECT * FROM comment WHERE post_id = :post_id")
-    public abstract List<Comment> findAllByPostId(@Bind("post_id") final Long post_id);
-
-    @SqlQuery("SELECT * FROM comment WHERE post_id := post_id AND status = 1")
-    public abstract List<Comment> findAllValidByPostId(@Bind("post_id") final Long post_id);
+    @SqlQuery("SELECT * FROM comment WHERE post_id := post_id AND status = :status")
+    public abstract List<Comment> getAllByPostId(
+        @Bind("post_id") final Long postId,
+        @Bind("status") final Integer status);
 
     @Transaction
-    public Comment createComment(Long user_id, Long post_id, Long music_id, String comment_body, Integer status, Date time_created, Date time_updated) {
+    public Comment create(final Long userId, final Long postId, final Long musicId, final String commentBody,
+                          final Integer status, final Date timeCreated, final Date timeUpdated) {
 
-        Long id = insert(user_id, post_id, music_id, comment_body, status, time_created, time_updated);
-
-        Comment c = findByCommentId(id);
-
-        return c;
+        final Long commentId = insert(userId, postId, musicId, commentBody, status, timeCreated, timeUpdated);
+        return getById(commentId);
     }
 
     @Transaction
-    public Comment updateComment(Long comment_id, Long music_id, String comment_body) {
+    public Comment update(final Long commentId, final Long musicId, final String commentBody) {
 
-        update(comment_id, music_id, comment_body);
-
-        Comment c = findByCommentId(comment_id);
-
-        return c;
+        updateComment(commentId, musicId, commentBody);
+        return getById(commentId);
     }
-    public abstract void close();
 
 }

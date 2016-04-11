@@ -24,18 +24,18 @@ public class UserServiceImpl implements UserService {
     public User createUser(final String email, final String password) {
 
         final Date timeNow = new Date();
-        final Long userId = userDao.createUser(email, null, password, Constant.USER_NOT_VERIFIED,
+        final Long userId = userDao.create(email, null, password, Constant.USER_NOT_VERIFIED,
             Role.USER.getValue(), Constant.USER_STATUS_ACTIVE, timeNow);
 
-        return userDao.getUserById(userId);
+        return userDao.getById(userId);
     }
 
     @Override
     public Optional<User> getUserByUserId(Long userId) {
-        return Optional.of(userDao.getUserById(userId));
+        return Optional.of(userDao.getById(userId));
     }
 
     @Override
-    public Optional<User> getUserByEmail(String email) { return Optional.ofNullable(userDao.getUserByEmail(email)); }
+    public Optional<User> getUserByEmail(String email) { return Optional.ofNullable(userDao.getByEmail(email)); }
 
 }

@@ -4,62 +4,59 @@ import java.io.Serializable;
 import java.sql.Date;
 
 public class Comment implements Serializable{
-    private static final Integer STATUS_ACTIVE = 1;
-    private static final Integer STATUS_INACTIVE = 0;
 
-
-    private Long comment_id;
-    private Long user_id;
-    private Long post_id;
-    private Long music_id;
-    private String comment_body;
+    private Long commentId;
+    private Long userId;
+    private Long postId;
+    private Long musicId;
+    private String commentBody;
     private Integer status;
-    private Date time_created;
-    private Date time_updated;
+    private Date timeCreated;
+    private Date timeUpdated;
 
     protected Comment(){}
 
-    public Comment(Long commentId, Long userId, Long postId, Long musicId, String body, Integer s, Date timeCreated, Date timeUpdated) {
-        this.comment_id = commentId;
-        this.user_id = userId;
-        this.post_id = postId;
-        this.music_id = musicId;
-        this.comment_body = body;
-        this.status = s;
-        this.time_created = timeCreated;
-        this.time_updated = timeUpdated;
+    public Comment(Long commentId, Long userId, Long postId, Long musicId, String body, Integer status, Date timeCreated, Date timeUpdated) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.postId = postId;
+        this.musicId = musicId;
+        this.commentBody = body;
+        this.status = status;
+        this.timeCreated = timeCreated;
+        this.timeUpdated = timeUpdated;
     }
 
-    public Long getComment_id() { return this.comment_id; }
+    public Long getCommentId() { return this.commentId; }
 
-    public void setComment_id(Long id) { this.comment_id = id; }
+    public void setCommentId(Long id) { this.commentId = id; }
 
-    public Long getUser_id() { return this.user_id; }
+    public Long getUserId() { return this.userId; }
 
-    public void setUser_id(Long id) { this.user_id = id; }
+    public void setUserId(Long id) { this.userId = id; }
 
-    public Long getPost_id() { return this.post_id; }
+    public Long getPostId() { return this.postId; }
 
-    public void setPost_id(Long id) { this.post_id = id; }
+    public void setPostId(Long id) { this.postId = id; }
 
-    public Long getMusic_id() { return this.music_id; }
+    public Long getMusicId() { return this.musicId; }
 
-    public void setMusic_id(Long id) { this.music_id = id; }
+    public void setMusicId(Long id) { this.musicId = id; }
 
-    public String getComment_body() { return this.comment_body; }
+    public String getCommentBody() { return this.commentBody; }
 
-    public void setComment_body(String body) { this.comment_body = body; }
+    public void setCommentBody(String body) { this.commentBody = body; }
 
     public Integer getStatus() { return this.status; }
 
     public void setStatus(Integer s) { this.status = s; }
 
-    public Date getTime_created() { return this.time_created; }
+    public Date getTimeCreated() { return this.timeCreated; }
 
-    public void setTime_created(Date time) { this.time_created = time; }
+    public void setTimeCreated(Date time) { this.timeCreated = time; }
 
-    public Date getTime_updated() { return this.time_updated; }
+    public Date getTimeUpdated() { return this.timeUpdated; }
 
-    public void setTime_updated(Date time) { this.time_updated = time; }
+    public void setTimeUpdated(Date time) { this.timeUpdated = time; }
 
 }

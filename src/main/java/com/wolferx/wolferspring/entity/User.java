@@ -18,10 +18,6 @@ public class User implements Serializable {
 
     protected User() { }
 
-    public User(Long userId) {
-        this.userId = userId;
-    }
-
     public User(Long userId, String email, String username, String password, Integer verified,
                 Integer accessLevel, Integer status, Date lastLogin, Date timeCreated, Date timeUpdated) {
 
@@ -35,10 +31,6 @@ public class User implements Serializable {
         this.lastLogin = lastLogin;
         this.timeCreated = timeCreated;
         this.timeUpdated = timeUpdated;
-    }
-
-    public User(String username) {
-        this.username = username;
     }
 
     public Long getUserId() { return userId; }

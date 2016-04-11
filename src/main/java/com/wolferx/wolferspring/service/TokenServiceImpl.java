@@ -36,24 +36,23 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Map<String,Object> verifyToken (final String token) {
+    public Map<String,Object> verifyToken (final String token)
+        throws InternalAuthenticationServiceException {
 
         final Map<String,Object> payload;
         try {
             payload = jwtVerifier.verify(token);
 
-            // validate payload
             if (payload.isEmpty()) {
-                logger.error("<In> verifyToken() Empty payload in verified token");
-                throw new InternalAuthenticationServiceException("Empty payload in verified token");
+                throw new InternalAuthenticationServiceException("Empty payload in token");
             }
 
-        } catch (final JWTVerifyException | IllegalStateException | IOException jwtVerifyException) {
-            logger.error("<In> verifyToken() Failed to verify token", jwtVerifyException);
-            throw new InternalAuthenticationServiceException("Failed to verify token", jwtVerifyException);
-        } catch (final InvalidKeyException | NoSuchAlgorithmException | SignatureException invalidTokenException) {
-            logger.error("<In> verifyToken() Invalid token", invalidTokenException);
-            throw new InternalAuthenticationServiceException("Invalid Token!", invalidTokenException);
+        } catch (final IllegalStateException | IOException jwtVerifyException) {
+            logger.error("<In> verifyToken(): Failed to verify token", jwtVerifyException);
+            throw new InternalAuthenticationServiceException("Failed to verify token!");
+        } catch (final JWTVerifyException | InvalidKeyException | NoSuchAlgorithmException | SignatureException invalidTokenException) {
+            logger.error("<In> verifyToken(): Invalid token", invalidTokenException);
+            throw new InternalAuthenticationServiceException("Invalid Token!");
         }
 
         return payload;

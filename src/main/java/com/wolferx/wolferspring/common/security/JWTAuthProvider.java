@@ -3,8 +3,8 @@ package com.wolferx.wolferspring.common.security;
 import com.wolferx.wolferspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +19,11 @@ public class JWTAuthProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(final Authentication authentication) throws InternalAuthenticationServiceException {
+    public Authentication authenticate(final Authentication authentication)
+        throws AuthenticationException {
 
         final String token = (String) authentication.getPrincipal();
-        return authService.authWithToken(token);
+        return authService.authByToken(token);
     }
 
     @Override

@@ -28,4 +28,9 @@ public class StorageServiceException extends BaseServiceException {
 
         super(errorCode);
     }
+
+    public StorageServiceException(final String error, final ErrorCode errorCode) {
+
+        super(error, errorCode);
+    }
 }

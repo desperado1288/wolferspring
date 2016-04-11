@@ -25,7 +25,7 @@ public class PasswordAuthProvider implements AuthenticationProvider {
         final String username = (String) authentication.getPrincipal();
         final String password = (String) authentication.getCredentials();
 
-        return authService.authWithPassword(username, password);
+        return authService.authByPassword(username, password);
     }
 
     @Override

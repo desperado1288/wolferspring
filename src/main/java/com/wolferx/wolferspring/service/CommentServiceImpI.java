@@ -1,92 +1,59 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageServiceException;
+import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.jdbi.dao.CommentDao;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.exceptions.DBIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class CommentServiceImpI implements CommentService {
 
-    @Autowired
-    private DBI dbi;
-
     private final CommentDao commentDao;
-    private static final Integer STATUS_ACTIVE = 1;
-    private static final Integer STATUS_INACTIVE = 0;
 
     @Autowired
     public CommentServiceImpI(final CommentDao dao) { this.commentDao = dao; }
 
     @Override
-    public Comment createComment(Long user_id, Long post_id, Long music_id, String comment_body)
-        throws StorageServiceException {
-        final Integer status = STATUS_ACTIVE;
-        final Date timeUpdated, timeCreated;
-        timeCreated = timeUpdated = new Date();
+    public Comment createComment(final Long userId, final Long postId, final Long musicId, final String commentBody) {
 
-        Comment comment;
-        try {
-            comment = this.commentDao.createComment(user_id, post_id, music_id, comment_body, status, timeUpdated, timeCreated);
-        } catch (final DBIException error) {
-            throw new StorageServiceException(
-                String.format("Error: [createComment] service for post: '%s' ", post_id), error);
-        }
-        return comment;
+        final Date timeNow = new Date();
+        return commentDao.create(userId, postId, musicId, commentBody, Constant.COMMENT_STATUS_ACTIVE, timeNow, timeNow);
     }
 
     @Override
-    public List<Comment> findAll(boolean all) {
+    public List<Comment> getAllComment(final Integer status) {
 
-        final List<Comment> clist;
-
-        if(all) {
-            clist = this.commentDao.findAll();
-        } else {
-            clist = this.commentDao.findAllValid();
-        }
-        return clist;
+        return commentDao.getAll(status);
     }
 
     @Override
-    public List<Comment> findByPostId(Long post_id) {
+    public Optional<List<Comment>> getCommentByPostId(final Long postId, final Integer status) {
 
-        final List<Comment> clist = this.commentDao.findAllValidByPostId(post_id);
-
-        return clist;
+        return Optional.ofNullable(commentDao.getAllByPostId(postId, status));
     }
 
     @Override
-    public Comment findByCommentId(Long comment_id) {
+    public Optional<Comment> getCommentById(final Long commentId) {
 
-        final Comment c = this.commentDao.findByCommentId(comment_id);
-
-        return c;
-    }
-
-
-    public Comment updateById(Long comment_id, Long music_id, String comment_body) {
-
-        final Comment c = this.commentDao.updateComment(comment_id, music_id, comment_body);
-
-        return c;
+        return Optional.ofNullable(commentDao.getById(commentId));
     }
 
     @Override
-    public void deleteById(Long comment_id) throws StorageServiceException {
+    public Comment updateCommentById(final Long commentId, final Long musicId, final String commentBody) {
 
-        try {
-            this.commentDao.delete(comment_id);
-        } catch(final DBIException error) {
-            throw new StorageServiceException(String.format("Error: [deleteComment] service for comment: '%s' ", comment_id), error);
-        }
+        return commentDao.update(commentId, musicId, commentBody);
+    }
+
+    @Override
+    public void deleteCommentById(final Long commentId) {
+
+        commentDao.delete(commentId);
     }
 }

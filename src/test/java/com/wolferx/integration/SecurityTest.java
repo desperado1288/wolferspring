@@ -126,7 +126,7 @@ public class SecurityTest {
         String username = "test_user_2";
         String password = "InvalidPassword";
 
-        BDDMockito.when(authService.authWithPassword(anyString(), anyString())).
+        BDDMockito.when(authService.authByPassword(anyString(), anyString())).
             thenThrow(new BadCredentialsException("Invalid Credentials"));
 
         given().header(X_AUTH_USERNAME, username).header(X_AUTH_PASSWORD, password).
@@ -162,7 +162,7 @@ public class SecurityTest {
 
         authenticationWithToken.setToken("hello_token");
 
-        BDDMockito.when(authService.authWithPassword(eq(username), eq(password))).
+        BDDMockito.when(authService.authByPassword(eq(username), eq(password))).
             thenReturn(authenticationWithToken);
 
         ValidatableResponse validatableResponse = given().header(X_AUTH_USERNAME, username).

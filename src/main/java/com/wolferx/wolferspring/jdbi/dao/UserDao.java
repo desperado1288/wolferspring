@@ -17,7 +17,7 @@ public abstract class UserDao {
         "INSERT INTO user(email, username, password, verified, access_level, status, last_login, time_created, time_updated)" +
             "VALUES (:email, :username, :password, :verified, :access_level, :status, :time_created, :time_created, :time_created)")
     @GetGeneratedKeys
-    public abstract Long createUser(
+    public abstract Long create(
         @Bind("email") final String email,
         @Bind("username") final String username,
         @Bind("password") final String password,
@@ -27,9 +27,9 @@ public abstract class UserDao {
         @Bind("time_created") final Date timeCreated);
 
     @SqlQuery("SELECT * FROM user WHERE user_id = :user_id")
-    public abstract User getUserById(@Bind("user_id") final Long userId);
+    public abstract User getById(@Bind("user_id") final Long userId);
 
     @SqlQuery("SELECT * FROM user WHERE email = :email")
-    public abstract User getUserByEmail(@Bind("email") final String email);
+    public abstract User getByEmail(@Bind("email") final String email);
 
 }

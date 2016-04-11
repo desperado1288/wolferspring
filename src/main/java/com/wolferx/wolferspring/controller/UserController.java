@@ -1,6 +1,8 @@
 package com.wolferx.wolferspring.controller;
 
+import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
+import com.wolferx.wolferspring.common.exception.NoSuchItemException;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.service.UserService;
@@ -13,8 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -31,25 +31,25 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public User getUserByUserId(@PathVariable("userId") Long userId)
+    public User getUserByUserId(@PathVariable("userId") final Long userId)
         throws BaseServiceException {
 
-        logger.info("<Start> getUserByUserId() : UserId: {}", userId);
+        logger.info("<Start> getUserByUserId(): UserId: {}", userId);
         final User user =  userService.getUserByUserId(userId)
-            .orElseThrow(() -> new NoSuchElementException(String.format("User : %s not found", userId)));
-        logger.info("<End> getUserByUserId() : UserId: {}", userId);
+            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getUserByUserId(): Not found: UserId: %s", userId), ErrorCode.ITEM_NOT_FOUND));
+        logger.info("<End> getUserByUserId(): UserId: {}", userId);
 
         return user;
     }
 
     @RequestMapping(value = "/{email}", method = RequestMethod.GET)
-    public User getUserByEmail(@PathVariable("email") String email)
+    public User getUserByEmail(@PathVariable("email") final String email)
         throws BaseServiceException {
 
-        logger.info("<Start> getUserByEmail() : Email: {}", email);
+        logger.info("<Start> getUserByEmail(): Email: {}", email);
         final User user =  userService.getUserByEmail(email)
-            .orElseThrow(() -> new NoSuchElementException(String.format("User : %s not found", email)));
-        logger.info("<End> getUserByEmail() : Email: {}", email);
+            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getUserByEmail(): Not found: UserId: %s", email), ErrorCode.ITEM_NOT_FOUND));
+        logger.info("<End> getUserByEmail(): Email: {}", email);
 
         return user;
     }
