@@ -2,8 +2,8 @@ package com.wolferx.wolferspring.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import com.wolferx.wolferspring.common.response.TokenResponse;
+import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.service.AuthService;
 import org.slf4j.Logger;
@@ -36,16 +36,9 @@ public class AuthController {
     public TokenResponse registerUser(@RequestBody final JsonNode requestBody)
         throws IOException, BaseServiceException {
 
-        // valid input
-        final String email;
-        final String password;
-        try {
-            email = requestBody.get("email").asText();
-            password = requestBody.get("password").asText();
-        } catch (NullPointerException nullPointerException) {
-            logger.error("<In> registerUser(): Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
-        }
+        // required input
+        final String email = (String) CommonUtils.parserJsonNode("email", requestBody, String.class, logger);
+        final String password = (String) CommonUtils.parserJsonNode("password", requestBody, String.class, logger);
 
         // register user
         logger.info("<Start> registerUser(): for User: {} ", email);
