@@ -5,18 +5,13 @@ import java.sql.Date;
 
 public class Post implements Serializable {
 
-    public static final Integer TYPE_MUSIC_POST = 1;
-    public static final Integer TYPE_TEXT_POST = 2;
-    public static final Integer STATUS_ACTIVE = 1;
-    public static final Integer STATUS_INACTIVE = 0;
-
     private Long postId;
     private Long userId;
-    private String post_title;
-    private String post_body;
-    private String post_cover_url;
+    private String postTitle;
+    private String postBody;
+    private String postCoverUrl;
     private Integer type;
-    private String music_ids;
+    private String musicIds;
     private String tag;
     private String slug;
     private Integer status;
@@ -24,44 +19,21 @@ public class Post implements Serializable {
     private Date timeUpdated;
 
     protected Post() { }
-    //music post
-    public Post(Long postId, Long userId, String post_title, String post_body, String post_cover_url, Integer type, String music_ids, String slug, String tag, Integer status, Date timeCreated, Date timeUpdated) {
+
+    public Post(Long postId, Long userId, String postTitle, String postBody, String postCoverUrl, Integer type, String musicIds, String slug, String tag, Integer status, Date timeCreated, Date timeUpdated) {
         this.postId = postId;
         this.userId = userId;
-        this.post_title = post_title;
-        this.post_body = post_body;
-        this.post_cover_url = post_cover_url;
+        this.postTitle = postTitle;
+        this.postBody = postBody;
+        this.postCoverUrl = postCoverUrl;
         this.type = type;
-        this.music_ids = music_ids;
+        this.musicIds = musicIds;
         this.tag = tag;
         this.slug = slug;
         this.status = status;
         this.timeCreated = timeCreated;
         this.timeUpdated = timeUpdated;
     }
-    //text post
-    public Post(Long postId, Long userId, String post_title, String post_body, Integer type, String slug, String tag, Integer status, Date timeCreated, Date timeUpdated) {
-        this.postId = postId;
-        this.userId = userId;
-        this.post_title = post_title;
-        this.post_body = post_body;
-        this.tag = tag;
-        this.type = type;
-        this.slug = slug;
-        this.status = status;
-        this.timeCreated = timeCreated;
-        this.timeUpdated = timeUpdated;
-    }
-
-    public Post(Long userId, String post_title, String slug, String tag) {
-        this.userId = userId;
-        this.post_title = post_title;
-        this.tag = tag;
-        this.slug = slug;
-        this.status = STATUS_ACTIVE;
-        this.type = TYPE_TEXT_POST;
-    }
-
 
     public Long getPostId() {
         return postId;
@@ -77,21 +49,21 @@ public class Post implements Serializable {
         this.userId = userId;
     }
 
-    public String getPost_title() { return post_title; }
+    public String getPostTitle() { return postTitle; }
 
-    public void setPost_title(String title) { this.post_title = title; }
+    public void setPostTitle(String title) { this.postTitle = title; }
 
-    public String getPost_body() { return post_body; }
+    public String getPostBody() { return postBody; }
 
-    public void setPost_body(String body) { this.post_body = body; }
+    public void setPostBody(String body) { this.postBody = body; }
 
-    public String getPost_cover_url() { return this.post_cover_url; }
+    public String getPostCoverUrl() { return this.postCoverUrl; }
 
-    public void setPost_cover_url(String post_cover_url) { this.post_cover_url = post_cover_url; }
+    public void setPostCoverUrl(String postCoverUrl) { this.postCoverUrl = postCoverUrl; }
 
-    public String getMusic_ids() { return this.music_ids; }
+    public String getMusicIds() { return this.musicIds; }
 
-    public void setMusic_ids(String music_ids) { this.music_ids = music_ids; }
+    public void setMusicIds(String musicIds) { this.musicIds = musicIds; }
 
     public Integer getType() { return this.type; }
 

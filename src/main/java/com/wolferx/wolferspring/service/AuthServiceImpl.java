@@ -45,13 +45,14 @@ public class AuthServiceImpl implements AuthService {
         final String hash = BCrypt.hashpw(password, salt);
         final User user = userService.createUser(email, hash);
 
-        return authWithUser(user);
+        return authByUser(user);
     }
 
     @Override
-    public UsernamePasswordAuthenticationToken authWithPassword(final String email, final String hashedPassword) {
-        logger.info("<Start> authWithPassword() User: {}", email);
+    public UsernamePasswordAuthenticationToken authByPassword(final String email, final String hashedPassword)
+        throws AuthenticationServiceException {
 
+        logger.info("<Start> authWithPassword() User: {}", email);
         // verify user existence
         final User user = userService.getUserByEmail(email)
             .orElseThrow(() -> {
@@ -84,9 +85,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public PreAuthenticatedAuthenticationToken authWithToken(final String token) {
-        logger.debug("<Start> authWithToken()");
+    public PreAuthenticatedAuthenticationToken authByToken(final String token)
+        throws AuthenticationServiceException {
 
+        logger.debug("<Start> authWithToken()");
         // verify token
         final Map<String, Object> payload = tokenService.verifyToken(token);
 
@@ -95,14 +97,14 @@ public class AuthServiceImpl implements AuthService {
         try {
             userId  = ((Integer) payload.get("userId")).longValue();
         } catch (NullPointerException nullPointerException) {
-            logger.error("<In> verifyToken() Not get userId from verified token. TokenPayload: {}", payload.toString());
+            logger.error("<In> verifyToken(): Missing UserId in token : TokenPayload: {}", payload.toString());
             throw new InternalAuthenticationServiceException("Invalid Token!");
         }
 
         final User user = userService.getUserByUserId(userId)
             .orElseThrow(()-> {
-                logger.error("<In> authWithToken() Not get user from verifyToken()");
-                return new AuthenticationServiceException("Unable to authenticate User with provided token");
+                logger.error("<In> authWithToken(): Failed to get user : UserId: {}", userId);
+                return new AuthenticationServiceException("Failed to authenticate User with provided token");
             });
 
         // set authentication
@@ -122,9 +124,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UsernamePasswordAuthenticationToken authWithUser(final User user) {
-        logger.debug("<Start> authWithUser()");
+    public UsernamePasswordAuthenticationToken authByUser(final User user) {
 
+        logger.debug("<Start> authWithUser()");
         // grant user roles
         final UsernamePasswordAuthenticationToken authentication;
         if (user.getAccessLevel().equals(Role.ADMIN.getValue())) {

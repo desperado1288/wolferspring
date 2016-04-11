@@ -2,7 +2,7 @@ package com.wolferx.wolferspring.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.InvalidInputException;
+import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import com.wolferx.wolferspring.common.response.TokenResponse;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.service.AuthService;
@@ -33,25 +33,25 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public TokenResponse registerUser(@RequestBody JsonNode requestJson)
+    public TokenResponse registerUser(@RequestBody final JsonNode requestBody)
         throws IOException, BaseServiceException {
 
         // valid input
         final String email;
         final String password;
         try {
-            email = requestJson.get("email").asText();
-            password = requestJson.get("password").asText();
+            email = requestBody.get("email").asText();
+            password = requestBody.get("password").asText();
         } catch (NullPointerException nullPointerException) {
-            logger.error("<In> registerUser() : get invalid credentials", nullPointerException);
-            throw new InvalidInputException("Invalid user provided credentials");
+            logger.error("<In> registerUser(): Missing required input", nullPointerException);
+            throw new InvalidRequestInputException("Missing required input");
         }
 
         // register user
-        logger.info("<Start> registerUser() for User: {} ", email);
+        logger.info("<Start> registerUser(): for User: {} ", email);
         final Authentication authentication = authService.registerUser(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        logger.info("End registerUser() for User: {}", email);
+        logger.info("<End> registerUser(): for User: {}", email);
 
         return new TokenResponse(authentication.getDetails().toString());
     }

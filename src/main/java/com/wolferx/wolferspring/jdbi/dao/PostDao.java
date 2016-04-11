@@ -48,40 +48,28 @@ public abstract class PostDao {
         @Bind("time_updated") final Date timeUpdated);
 
     @SqlUpdate("UPDATE post SET status = 0 WHERE post_id = :post_id")
-    public abstract void deletePost(@Bind("post_id") final Long post_id);
+    public abstract void delete(@Bind("post_id") final Long post_id);
 
-    @SqlQuery("SELECT * FROM post")
-    public abstract List<Post> findAll();
-
-    @SqlQuery("SELECT * FROM post WHERE status = 1")
-    public abstract List<Post> findAllValid();
+    @SqlQuery("SELECT * FROM post WHERE status = :status")
+    public abstract List<Post> getAll(@Bind("status") final Integer status);
 
     @SqlQuery("SELECT * FROM post WHERE post_id = :post_id")
-    public abstract Post findPostById(@Bind("post_id") final Long postId);
+    public abstract Post getById(@Bind("post_id") final Long postId);
 
     @Transaction
-    public Post createPost(Long userId, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag,
-                           Integer status, Date timeCreated, Date timeUpdated) {
+    public Post create(final Long userId, final String title, final String body, final String postCoverUrl,
+                       final Integer type, final String musicIds, final String slug, final String tag,
+                       final Integer status, final Date timeCreated, final Date timeUpdated) {
 
-        final Long genPostId = insertPost(userId, title, body, postCoverUrl, type, musicids, slug, tag, status, timeCreated, timeUpdated);
-
-        Post post = findPostById(genPostId);
-
-        return post;
+        final Long genPostId = insertPost(userId, title, body, postCoverUrl, type, musicIds, slug, tag, status, timeCreated, timeUpdated);
+        return getById(genPostId);
     }
 
     @Transaction
-    public Post update(Long post_id, String title, String body, String postCoverUrl, Integer type, String musicids, String slug, String tag,
-                           Date timeUpdated) {
+    public Post update(final Long post_id, final String title, final String body, final String postCoverUrl, final Integer type,
+                       final String musicids, final String slug, final String tag, final Date timeUpdated) {
 
         updatePost(post_id, title, body, postCoverUrl, type, musicids, slug, tag, timeUpdated);
-
-        Post post = findPostById(post_id);
-
-        return post;
+        return getById(post_id);
     }
-
-
-
-    public abstract void close();
 }

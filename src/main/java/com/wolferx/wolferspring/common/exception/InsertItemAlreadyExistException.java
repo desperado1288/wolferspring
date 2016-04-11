@@ -28,4 +28,9 @@ public class InsertItemAlreadyExistException extends BaseServiceException {
 
         super(errorCode);
     }
+
+    public InsertItemAlreadyExistException(final String error, final ErrorCode errorCode) {
+
+        super(error, errorCode);
+    }
 }

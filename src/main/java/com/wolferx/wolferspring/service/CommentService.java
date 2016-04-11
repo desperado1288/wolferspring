@@ -1,23 +1,22 @@
 package com.wolferx.wolferspring.service;
 
-import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.entity.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentService {
 
-    Comment createComment(Long user_id, Long post_id, Long music_id, String comment_body) throws StorageServiceException;
+    List<Comment> getAllComment(Integer status);
 
-    List<Comment> findAll(boolean all);
+    Optional<Comment> getCommentById(Long commentId);
 
-    List<Comment> findByPostId(Long post_id);
+    Optional<List<Comment>> getCommentByPostId(Long postId, Integer status);
 
-    Comment findByCommentId(Long comment_id);
+    Comment createComment(Long userId, Long postId, Long musicId, String commentBody);
 
-    Comment updateById(Long comment_id, Long music_id, String comment_body);
+    Comment updateCommentById(Long commentId, Long musicId, String commentBody);
 
-    void deleteById(Long comment_id) throws StorageServiceException;
-
+    void deleteCommentById(Long commentId);
 
 }

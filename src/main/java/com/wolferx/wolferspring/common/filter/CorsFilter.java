@@ -28,7 +28,7 @@ public class CorsFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(final FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
         filterConfig.getServletContext().log("Initializing CorsFilter ...");
     }

@@ -7,10 +7,10 @@ import java.util.Optional;
 
 public interface UserService {
 
-    User createUser(String email, String password);
-
     Optional<User> getUserByUserId(Long userId);
 
     Optional<User> getUserByEmail(String email);
+
+    User createUser(String email, String password);
 
 }

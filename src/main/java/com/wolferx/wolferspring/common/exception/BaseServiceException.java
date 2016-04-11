@@ -5,6 +5,7 @@ import com.wolferx.wolferspring.common.constant.ErrorCode;
 public class BaseServiceException extends Exception {
 
     private ErrorCode errorCode;
+    private String error;
 
     BaseServiceException() {
         super();
@@ -27,7 +28,17 @@ public class BaseServiceException extends Exception {
         this.errorCode = errorCode;
     }
 
+    public BaseServiceException(final String error, final ErrorCode errorCode) {
+        super(errorCode.toString());
+        this.errorCode = errorCode;
+        this.error = error;
+    }
+
+    public String getErrorMessage() {
+        return error;
+    }
     public ErrorCode getErrorCode() {
         return errorCode;
     }
+
 }

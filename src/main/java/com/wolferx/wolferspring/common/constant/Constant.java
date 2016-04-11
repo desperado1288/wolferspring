@@ -11,9 +11,14 @@ public class Constant {
      * CORS
      */
     public final static String  ACCESS_CONTROL_ALLOW_ORIGIN = "*";
-    public final static String  ACCESS_CONTROL_ALLOW_METHODS = "POST, GET, OPTIONS, PUT, DELETE";
+    public final static String  ACCESS_CONTROL_ALLOW_METHODS = "POST, GET, PUT, DELETE, OPTIONS";
     public final static String  ACCESS_CONTROL_MAX_AGE = "3600"; // 60 * 60 = 1 HOUR
-    public final static String  ACCESS_CONTROL_ALLOW_HEADERS = "Origin, X-Requested-With, Content-Type, Accept"; // 60 * 60 = 1 HOUR
+    public final static String  ACCESS_CONTROL_ALLOW_HEADERS = "Origin, X-Requested-With, Content-Type, Accept";
+
+    /**
+     * Response
+     */
+    public final static String  RESPONSE_ACTION_SUCCESS = "ACTION HAS BEEN EXECUTED SUCCESSFULLY";
 
     /**
      * User
@@ -34,4 +39,17 @@ public class Constant {
     public final static Integer AUTH_JWT_SALT_LENGTH            = 8;
     public final static Integer AUTH_JWT_TOKEN_EXPIRE           = 60 * 60;
 
+    /**
+     * Post
+     */
+    public final static Integer POST_STATUS_INACTIVE = 0;
+    public final static Integer POST_STATUS_ACTIVE = 1;
+    public static final Integer POST_TYPE_TEXT = 1;
+    public static final Integer POST_TYPE_MUSIC = 2;
+
+    /**
+     * Comment
+     */
+    public final static Integer COMMENT_STATUS_INACTIVE = 0;
+    public final static Integer COMMENT_STATUS_ACTIVE = 1;
 }

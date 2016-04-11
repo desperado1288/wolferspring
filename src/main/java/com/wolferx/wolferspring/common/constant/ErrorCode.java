@@ -1,10 +1,30 @@
 package com.wolferx.wolferspring.common.constant;
 
-public class ErrorCode {
+public enum  ErrorCode {
 
     /**
      * Use: error code instead of error message
      * When: the message itself should be hidden from client
      */
-    public final static Integer SOME_INTERNAL_ERROR = 9000;
+    ITEM_NOT_FOUND("Item not found!", 101);
+
+    private final String message;
+    private final Integer code;
+
+    private ErrorCode(final String errorMessage, final Integer code) {
+        this.message = errorMessage;
+        this.code = code;
+    }
+
+    public boolean equals(final Integer otherCode) {
+        return otherCode != null && code.equals(otherCode);
+    }
+
+    public String toString() {
+        return code.toString();
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }
