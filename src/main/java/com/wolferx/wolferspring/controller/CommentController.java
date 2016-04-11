@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import com.wolferx.wolferspring.common.exception.NoSuchItemException;
+import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.service.CommentService;
@@ -37,7 +37,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value="/complete", method = RequestMethod.GET)
     public List<Comment> getAllComment()
         throws BaseServiceException {
 
@@ -78,18 +78,9 @@ public class CommentController {
 
         logger.info("<Start> createComment()");
         // required input
-        final Long userId;
-        final Long postId;
-        final String commentBody;
-        try {
-            userId = requestBody.get("postTitle").asLong();
-            postId = requestBody.get("postBody").asLong();
-            commentBody = requestBody.get("commentBody").asText();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("<In> createPost(): Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
-        }
-
+        final Long userId = (Long) CommonUtils.parserJsonNode("userId", requestBody, Long.class, logger);
+        final Long postId = (Long) CommonUtils.parserJsonNode("postId", requestBody, Long.class, logger);
+        final String commentBody = (String) CommonUtils.parserJsonNode("commentBody", requestBody, String.class, logger);
         // optional input
         final Long musicId = requestBody.has("musicId") ? requestBody.get("musicId").asLong() : null;
 
@@ -103,13 +94,7 @@ public class CommentController {
     public Comment updateComment(@RequestBody final JsonNode requestBody)
         throws BaseServiceException {
 
-        final Long commentId;
-        try {
-            commentId = requestBody.get("commentId").asLong();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
-        }
+        final Long commentId = (Long) CommonUtils.parserJsonNode("commentId", requestBody, Long.class, logger);
 
         final Comment baseComment = commentService.getCommentById(commentId)
             .orElseThrow(() -> new NoSuchItemException(String.format("<In> updatePost(): Not found: CommentId: %s", commentId)));

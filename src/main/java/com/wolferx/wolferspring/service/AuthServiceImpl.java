@@ -49,20 +49,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UsernamePasswordAuthenticationToken authByPassword(final String email, final String hashedPassword)
+    public UsernamePasswordAuthenticationToken authByPassword(final String email, final String password)
         throws AuthenticationServiceException {
 
-        logger.info("<Start> authWithPassword() User: {}", email);
+        logger.info("<Start> authWithPassword(): User: {}", email);
         // verify user existence
         final User user = userService.getUserByEmail(email)
             .orElseThrow(() -> {
-                logger.error("<In> authWithPassword() Not get User: {}", email);
+                logger.error("<In> authWithPassword(): Not get User: {}", email);
                 return new AuthenticationServiceException("Unable to authenticate User with provided credentials");
             });
 
         // verify user password
-        if (!hashedPassword.equals(user.getPassword())) {
-            logger.info("<In> authWithPassword() Invalid password for User: {}", email);
+        if (!BCrypt.checkpw(password, user.getPassword())) {
+            logger.info("<In> authWithPassword(): Invalid password for User: {}", email);
             throw new AuthenticationServiceException("Unable to authenticate User with provided credentials");
         }
 
@@ -80,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
         final String token = tokenService.signToken(user.getUserId());
         authentication.setDetails(token);
 
-        logger.info("<End> authWithPassword() User: {}", email);
+        logger.info("<End> authWithPassword(): User: {}", email);
         return authentication;
     }
 

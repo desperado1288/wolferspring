@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 
 public class CommonUtils {
 
-    @SuppressWarnings("unchecked")
     public static Object parserJsonNode(final String key, final JsonNode sourceNode, final Class clazz, final Logger logger)
         throws InvalidRequestInputException {
 

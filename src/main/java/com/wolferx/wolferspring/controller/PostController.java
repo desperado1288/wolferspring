@@ -5,7 +5,6 @@ import com.wolferx.wolferspring.common.annotation.LoggedUser;
 import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import com.wolferx.wolferspring.common.exception.NoSuchItemException;
 import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.config.RouteConfig;
@@ -24,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 
 @RestController
 @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -39,17 +36,6 @@ public class PostController {
     @Autowired
     public PostController(final PostService postService) {
         this.postService = postService;
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    public List<Post> getAllPost()
-        throws BaseServiceException {
-
-        logger.info("<Start> getAllPost()");
-        final List<Post> posts = postService.getAllPost(Constant.POST_STATUS_ACTIVE);
-        logger.info("<End> getAllPost()");
-
-        return posts;
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.GET)
@@ -70,16 +56,8 @@ public class PostController {
 
         logger.info("<Start> createPost()");
         // required input
-        final String title;
-        final String body;
-        try {
-            title = requestBody.get("postTitle").asText();
-            body = requestBody.get("postBody").asText();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("<In> createPost(): Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
-        }
-
+        final String title = (String) CommonUtils.parserJsonNode("postTitle", requestBody, String.class, logger);
+        final String body = (String) CommonUtils.parserJsonNode("postBody", requestBody, String.class, logger);
         // optional input
         final String postCoverUrl = requestBody.has("postCoverUrl") ? requestBody.get("postCoverUrl").asText() : null;
         final String musicIds = requestBody.has("musicIds") ? requestBody.get("musicIds").asText() : null;
@@ -96,13 +74,8 @@ public class PostController {
     @RequestMapping(method = RequestMethod.PUT)
     public Post updatePost(@RequestBody final JsonNode requestBody)
         throws BaseServiceException {
-        final Long postId;
-        try {
-            postId = requestBody.get("postId").asLong();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("<In> updatePost(): Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
-        }
+
+        final Long postId = (Long) CommonUtils.parserJsonNode("postId", requestBody, Long.class, logger);
 
         logger.info("<Start> updatePost(): PostId: {}", postId);
         final Post basePost = postService.getPostById(postId)
@@ -122,11 +95,9 @@ public class PostController {
         return post;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public Boolean deletePost(@RequestBody final JsonNode requestBody)
+    @RequestMapping(value = "/{postId}", method = RequestMethod.DELETE)
+    public Boolean deletePost(@PathVariable("postId") final Long postId)
         throws BaseServiceException {
-
-        final Long postId = (Long) CommonUtils.parserJsonNode("postId", requestBody, Long.class, logger);
 
         logger.info("<Start> deletePost(): postId: {}", postId);
         postService.deletePostById(postId);
