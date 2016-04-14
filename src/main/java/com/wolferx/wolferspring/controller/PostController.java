@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 
 @RestController
 @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -39,14 +41,13 @@ public class PostController {
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.GET)
-    public Post getPostById(@PathVariable("postId") final Long postId)
+    public Post getPostById(@PathVariable("postId") final Long postId, HttpServletResponse response)
         throws BaseServiceException {
 
         logger.info("<Start> getPostById(): PostId: {}", postId);
         final Post post =  postService.getPostById(postId)
             .orElseThrow(() -> new NoSuchItemException(String.format("<In> getPostById(): Not found: PostId: %s", postId), ErrorCode.ITEM_NOT_FOUND));
         logger.info("<End> getPostById(): PostId: {}", postId);
-
         return post;
     }
 

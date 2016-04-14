@@ -3,18 +3,17 @@ package com.wolferx.wolferspring.common.security;
 import com.wolferx.wolferspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PasswordAuthProvider implements AuthenticationProvider {
+public class JWTRefreshTokenAuthProvider implements AuthenticationProvider {
 
     private AuthService authService;
 
     @Autowired
-    public PasswordAuthProvider(final AuthService authService) {
+    public JWTRefreshTokenAuthProvider(AuthService authService) {
         this.authService = authService;
     }
 
@@ -22,14 +21,12 @@ public class PasswordAuthProvider implements AuthenticationProvider {
     public Authentication authenticate(final Authentication authentication)
         throws AuthenticationException {
 
-        final String username = (String) authentication.getPrincipal();
-        final String password = (String) authentication.getCredentials();
-
-        return authService.authByPassword(username, password, false);
+        final String refreshToken = (String) authentication.getPrincipal();
+        return authService.authByRefreshToken(refreshToken);
     }
 
     @Override
     public boolean supports(final Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return authentication.equals(JWTAuthRefreshToken.class);
     }
 }

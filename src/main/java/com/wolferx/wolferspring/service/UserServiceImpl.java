@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Autowired
-    UserServiceImpl(final UserDao userDao) {
+    UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
 
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserByUserId(Long userId) {
-        return Optional.of(userDao.getById(userId));
+        return Optional.ofNullable(userDao.getById(userId));
     }
 
     @Override

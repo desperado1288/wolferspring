@@ -2,8 +2,8 @@ package com.wolferx.wolferspring.config;
 
 import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.filter.AuthMainFilter;
-import com.wolferx.wolferspring.common.security.JWTAuthProvider;
-import com.wolferx.wolferspring.common.security.PasswordAuthProvider;
+import com.wolferx.wolferspring.common.security.JWTRefreshTokenAuthProvider;
+import com.wolferx.wolferspring.common.security.JWTTokenAuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private PasswordAuthProvider passwordAuthProvider;
+    private JWTTokenAuthProvider jwtTokenAuthProvider;
     @Autowired
-    private JWTAuthProvider jwtAuthProvider;
+    private JWTRefreshTokenAuthProvider jwtRefreshTokenAuthProvider;
 
     /***
      * Config what resources need to be protected
@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().authenticated().and()
             // set logout action
             .logout().logoutUrl(RouteConfig.LOGOUT_URL)
-            .logoutSuccessUrl(RouteConfig.LOGOUT_SUCCESS_URL).deleteCookies(Constant.AUTH_JWT_REFRESH_TOKEN_COOKIE);
+            .logoutSuccessUrl(RouteConfig.LOGOUT_SUCCESS_URL).deleteCookies(Constant.AUTH_JWT_TOKEN_COOKIE);
 
         // add customized JWT authentication filter before spring security filter
         http.addFilterBefore(new AuthMainFilter(authenticationManager()), BasicAuthenticationFilter.class);
@@ -83,8 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         // register auth provider
         authenticationManagerBuilder
-            .authenticationProvider(passwordAuthProvider)
-            .authenticationProvider(jwtAuthProvider);
+            .authenticationProvider(jwtTokenAuthProvider)
+            .authenticationProvider(jwtRefreshTokenAuthProvider);
     }
 
     /**
