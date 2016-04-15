@@ -199,7 +199,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // set token
-        final String token = tokenService.genToken(user.getUserId());
+        final Token token = new Token(tokenService.genToken(user.getUserId()));
 
         authentication.setDetails(token);
 
