@@ -4,8 +4,10 @@ import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
 import com.wolferx.wolferspring.common.constant.Constant;
+import com.wolferx.wolferspring.jdbi.dao.TokenDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +15,10 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -27,14 +31,39 @@ public class TokenServiceImpl implements TokenService {
         .setExpirySeconds(Constant.AUTH_JWT_TOKEN_EXPIRE)
         .setNotValidBeforeLeeway(5).setIssuedAt(true)
         .setJwtId(true);
+    private static final JWTSigner.Options jwtRefreshOptions = new JWTSigner.Options()
+        .setExpirySeconds(Constant.AUTH_JWT_REFRESH_TOKEN_EXPIRE)
+        .setNotValidBeforeLeeway(5).setIssuedAt(true)
+        .setJwtId(true);
+
+    private TokenDao tokenDao;
+
+    public TokenServiceImpl() { }
+
+    @Autowired
+    public TokenServiceImpl(TokenDao tokenDao) {
+        this.tokenDao = tokenDao;
+    }
 
     @Override
-    public String signToken (final Long userId ) {
+    public String genToken(final Long userId) {
 
         final Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
 
         return jwtSigner.sign(claims, jwtOptions);
+    }
+
+    @Override
+    public String genRefreshToken(final Long userId) {
+
+        final Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        final String refreshToken = jwtSigner.sign(claims, jwtRefreshOptions);
+        final Date timeNow = new Date();
+        tokenDao.upsert(userId, "", "", refreshToken, timeNow);
+
+        return refreshToken;
     }
 
     @Override
@@ -58,5 +87,10 @@ public class TokenServiceImpl implements TokenService {
         }
 
         return payload;
+    }
+
+    @Override
+    public Optional<String> getRefreshTokenByUserId (final Long userId) {
+        return Optional.ofNullable(tokenDao.getRefreshTokenByUserId(userId));
     }
 }

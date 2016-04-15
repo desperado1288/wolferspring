@@ -3,6 +3,7 @@ package com.wolferx.wolferspring.config;
 import com.wolferx.wolferspring.common.filter.CorsFilter;
 import com.wolferx.wolferspring.jdbi.dao.CommentDao;
 import com.wolferx.wolferspring.jdbi.dao.PostDao;
+import com.wolferx.wolferspring.jdbi.dao.TokenDao;
 import com.wolferx.wolferspring.jdbi.dao.UserDao;
 import org.skife.jdbi.v2.DBI;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 
 import javax.servlet.Filter;
 
@@ -32,6 +34,7 @@ public class AppConfig {
         final Filter corsFilter = new CorsFilter();
         beanFactory.autowireBean(corsFilter);
         filterRegistration.setFilter(corsFilter);
+        filterRegistration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         filterRegistration.addUrlPatterns("/*");
         return filterRegistration;
     }
@@ -40,9 +43,11 @@ public class AppConfig {
     //** DAO
     //***********
     @Bean
+    public UserDao userDao() { return this.appDbi.onDemand(UserDao.class); }
+    @Bean
     public PostDao postDao() { return this.appDbi.onDemand(PostDao.class); }
     @Bean
     public CommentDao commentDao() { return this.appDbi.onDemand(CommentDao.class); }
     @Bean
-    public UserDao userDao() { return this.appDbi.onDemand(UserDao.class); }
+    public TokenDao tokenDao() { return this.appDbi.onDemand(TokenDao.class); }
 }

@@ -1,6 +1,9 @@
 package com.wolferx.wolferspring.common.filter;
 
 import com.wolferx.wolferspring.common.constant.Constant;
+import com.wolferx.wolferspring.common.security.JWTAuthRefreshToken;
+import com.wolferx.wolferspring.common.security.JWTAuthToken;
+import com.wolferx.wolferspring.common.utils.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -36,7 +38,8 @@ public class AuthMainFilter extends GenericFilterBean {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
-        final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_HEADER));
+        final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_TOKEN_HEADER));
+        final Optional<String> inputRefreshToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_REFRESH_TOKEN_HEADER));
 
         try {
             /**
@@ -82,15 +85,29 @@ public class AuthMainFilter extends GenericFilterBean {
 
                 logger.debug("<Start> Authenticate user with token");
                 final String token = inputToken.get();
-                final PreAuthenticatedAuthenticationToken authRequest = new PreAuthenticatedAuthenticationToken(token, null);
+                final JWTAuthToken authRequest = new JWTAuthToken(token, null);
                 final Authentication authentication = authenticationManager.authenticate(authRequest);
                 if (authentication == null || !authentication.isAuthenticated()) {
                     logger.error("<In> Failed to authenticate User with token");
                     throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
                 }
                 logger.debug("<End> Authenticate user with token");
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } else if (inputRefreshToken.isPresent()) {
+
+                logger.debug("<Start> Authenticate user with refresh token");
+                final String refreshToken = inputRefreshToken.get();
+                final JWTAuthRefreshToken authRequest = new JWTAuthRefreshToken(refreshToken, null);
+                final Authentication authentication = authenticationManager.authenticate(authRequest);
+                if (authentication == null || !authentication.isAuthenticated()) {
+                    logger.error("<In> Failed to authenticate User with token");
+                    throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
+                }
+                logger.debug("<End> Authenticate user with refresh token");
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, authentication.getCredentials().toString(), Constant.AUTH_JWT_TOKEN_EXPIRE);
             }
 
             /**********

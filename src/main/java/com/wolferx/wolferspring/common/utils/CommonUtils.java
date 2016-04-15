@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import org.slf4j.Logger;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 public class CommonUtils {
 
     public static Object parserJsonNode(final String key, final JsonNode sourceNode, final Class clazz, final Logger logger)
@@ -23,5 +26,14 @@ public class CommonUtils {
             logger.error("<In> parserJsonNode(): Missing required input", nullPointerException);
             throw new InvalidRequestInputException("Missing required input");
         }
+    }
+
+    public static void addCookie(final HttpServletResponse response, final String cookieName, final String cookieValue, final Integer cookieExpire) {
+        final Cookie cookie = new Cookie(cookieName, cookieValue);
+        cookie.setHttpOnly(true);
+        //cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(cookieExpire);
+        response.addCookie(cookie);
     }
 }
