@@ -30,10 +30,11 @@ public class CommonUtils {
 
     public static void addCookie(final HttpServletResponse response, final String cookieName, final String cookieValue, final Integer cookieExpire) {
         final Cookie cookie = new Cookie(cookieName, cookieValue);
-        cookie.setHttpOnly(true);
         //cookie.setSecure(true);
+        cookie.setDomain("localhost");
         cookie.setPath("/");
         cookie.setMaxAge(cookieExpire);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
 }
