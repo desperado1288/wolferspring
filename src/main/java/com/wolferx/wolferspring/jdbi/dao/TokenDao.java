@@ -41,10 +41,13 @@ public abstract class TokenDao {
 
     @Transaction
     public Integer upsert(Long userId, String device, String ip, String refreshToken, Date timeNow) {
-
-        if (getRefreshTokenByUserId(userId).isEmpty()) {
+        try {
+            getRefreshTokenByUserId(userId);
+            return update(userId, device, ip, refreshToken, timeNow);
+        } catch (final NullPointerException nullPointerException) {
             return create(userId, device, ip, refreshToken, timeNow);
         }
-        return update(userId, device, ip, refreshToken, timeNow);
     }
+
+    abstract void close();
 }

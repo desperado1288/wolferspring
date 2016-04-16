@@ -32,4 +32,5 @@ public abstract class UserDao {
     @SqlQuery("SELECT * FROM user WHERE email = :email")
     public abstract User getByEmail(@Bind("email") final String email);
 
+    abstract void close();
 }

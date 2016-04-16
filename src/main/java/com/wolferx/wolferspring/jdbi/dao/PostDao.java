@@ -72,4 +72,6 @@ public abstract class PostDao {
         updatePost(postId, title, body, postCoverUrl, type, musicids, slug, tag, timeUpdated);
         return getById(postId);
     }
+
+    abstract void close();
 }

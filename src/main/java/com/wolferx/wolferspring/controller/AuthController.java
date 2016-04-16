@@ -36,7 +36,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public TokenResponse registerUser(@RequestBody final JsonNode requestBody)
+    public TokenResponse registerUser(@RequestBody final JsonNode requestBody, final HttpServletResponse response)
         throws IOException, BaseServiceException {
 
         // required input
@@ -47,9 +47,11 @@ public class AuthController {
         logger.info("<Start> registerUser(): for User: {} ", email);
         final Authentication authentication = authService.registerUser(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        logger.info("<End> registerUser(): for User: {}", email);
+        final Token token = (Token) authentication.getDetails();
+        CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, token.getToken(), -1);
 
-        return new TokenResponse((Token) authentication.getDetails());
+        logger.info("<End> registerUser(): for User: {}", email);
+        return new TokenResponse(token);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
