@@ -1,22 +1,53 @@
 package com.wolferx.wolferspring.service;
 
+import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.entity.Comment;
+import com.wolferx.wolferspring.jdbi.dao.CommentDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentService {
+@Service
+@Transactional
+public class CommentService {
 
-    List<Comment> getAllComment(Integer status);
+    private final CommentDao commentDao;
 
-    Optional<Comment> getCommentById(Long commentId);
+    @Autowired
+    public CommentService(final CommentDao dao) { this.commentDao = dao; }
 
-    Optional<List<Comment>> getCommentByPostId(Long postId, Integer status);
+    public Comment createComment(final Long userId, final Long postId, final Long musicId, final String commentBody) {
 
-    Comment createComment(Long userId, Long postId, Long musicId, String commentBody);
+        final Date timeNow = new Date();
+        return commentDao.create(userId, postId, musicId, commentBody, Constant.COMMENT_STATUS_ACTIVE, timeNow, timeNow);
+    }
 
-    Comment updateCommentById(Long commentId, Long musicId, String commentBody);
+    public List<Comment> getAllComment(final Integer status) {
 
-    void deleteCommentById(Long commentId);
+        return commentDao.getAll(status);
+    }
 
+    public Optional<List<Comment>> getCommentByPostId(final Long postId, final Integer status) {
+
+        return Optional.ofNullable(commentDao.getAllByPostId(postId, status));
+    }
+
+    public Optional<Comment> getCommentById(final Long commentId) {
+
+        return Optional.ofNullable(commentDao.getById(commentId));
+    }
+
+    public Comment updateCommentById(final Long commentId, final Long musicId, final String commentBody) {
+
+        return commentDao.update(commentId, musicId, commentBody);
+    }
+
+    public void deleteCommentById(final Long commentId) {
+
+        commentDao.delete(commentId);
+    }
 }
