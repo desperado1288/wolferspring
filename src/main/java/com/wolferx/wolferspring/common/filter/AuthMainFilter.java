@@ -17,6 +17,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,8 +39,10 @@ public class AuthMainFilter extends GenericFilterBean {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
-        final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_TOKEN_HEADER));
-        final Optional<String> inputRefreshToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_REFRESH_TOKEN_HEADER));
+        //final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_TOKEN_HEADER));
+        //final Optional<String> inputRefreshToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_REFRESH_TOKEN_HEADER));
+        final Optional<Cookie> jwtCookie = CommonUtils.getCookie(request, Constant.AUTH_JWT_TOKEN_COOKIE);
+        final Optional<Cookie> jwtRefreshCookie = CommonUtils.getCookie(request, Constant.AUTH_JWT_REFRESH_TOKEN_COOKIE);
 
         try {
             /**
@@ -81,10 +84,10 @@ public class AuthMainFilter extends GenericFilterBean {
              * call: JWT authentication
              * when: token is presented in header
              */
-            if (inputToken.isPresent()) {
+            if (jwtCookie.isPresent()) {
 
                 logger.debug("<Start> Authenticate user with token");
-                final String token = inputToken.get();
+                final String token = jwtCookie.get().getValue();
                 final JWTAuthToken authRequest = new JWTAuthToken(token, null);
                 final Authentication authentication = authenticationManager.authenticate(authRequest);
                 if (authentication == null || !authentication.isAuthenticated()) {
@@ -94,10 +97,10 @@ public class AuthMainFilter extends GenericFilterBean {
                 logger.debug("<End> Authenticate user with token");
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            } else if (inputRefreshToken.isPresent()) {
+            } else if (jwtRefreshCookie.isPresent()) {
 
                 logger.debug("<Start> Authenticate user with refresh token");
-                final String refreshToken = inputRefreshToken.get();
+                final String refreshToken = jwtRefreshCookie.get().getValue();
                 final JWTAuthRefreshToken authRequest = new JWTAuthRefreshToken(refreshToken, null);
                 final Authentication authentication = authenticationManager.authenticate(authRequest);
                 if (authentication == null || !authentication.isAuthenticated()) {

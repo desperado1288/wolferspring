@@ -5,7 +5,9 @@ import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
 import org.slf4j.Logger;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 public class CommonUtils {
 
@@ -36,5 +38,17 @@ public class CommonUtils {
         cookie.setMaxAge(cookieExpire);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
+    }
+
+    public static Optional<Cookie> getCookie(final HttpServletRequest request, final String cookieName) {
+        final Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                if (cookies[i].getName().equals(cookieName)) {
+                    return Optional.of(new Cookie(cookieName, cookies[i].getValue()));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
