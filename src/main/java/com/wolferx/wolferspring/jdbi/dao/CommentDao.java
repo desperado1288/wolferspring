@@ -65,4 +65,5 @@ public abstract class CommentDao {
         return getById(commentId);
     }
 
+    abstract void close();
 }

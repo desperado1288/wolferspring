@@ -48,4 +48,6 @@ public abstract class TokenDao {
             return create(userId, device, ip, refreshToken, timeNow);
         }
     }
+
+    abstract void close();
 }
