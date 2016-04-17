@@ -4,11 +4,12 @@ import com.auth0.jwt.JWTSigner;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.JWTVerifyException;
 import com.wolferx.wolferspring.common.constant.Constant;
+import com.wolferx.wolferspring.common.exception.AuthServiceException;
 import com.wolferx.wolferspring.jdbi.dao.TokenDao;
+import org.skife.jdbi.v2.exceptions.DBIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,12 +19,11 @@ import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class TokenService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TokenService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     private static final JWTSigner jwtSigner = new JWTSigner(Constant.AUTH_JWT_SECRET);
     private static final JWTVerifier jwtVerifier = new JWTVerifier(Constant.AUTH_JWT_SECRET);
@@ -53,40 +53,67 @@ public class TokenService {
         return jwtSigner.sign(claims, jwtOptions);
     }
 
-    public String genRefreshToken(final Long userId) {
+    public String genRefreshToken(final Long userId)
+        throws AuthServiceException {
 
         final Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         final String refreshToken = jwtSigner.sign(claims, jwtRefreshOptions);
         final Date timeNow = new Date();
-        tokenDao.upsert(userId, "", "", refreshToken, timeNow);
+        // upsert token
+        try {
+            final Integer changes = tokenDao.update(userId, "", "", refreshToken, timeNow);
+            if (changes == 0) {
+                try {
+                    tokenDao.create(userId, "", "", refreshToken, timeNow);
+                } catch (final DBIException dbiException) {
+                    logger.error("<In> genRefreshToken(): Caught DBIException: {}", dbiException.toString());
+                    throw new AuthServiceException();
+                }
+            }
+        } catch (final DBIException dbiException) {
+            logger.error("<In> genRefreshToken(): Caught DBIException: {}", dbiException.toString());
+            throw new AuthServiceException();
+        }
 
         return refreshToken;
     }
 
     public Map<String,Object> verifyToken (final String token)
-        throws InternalAuthenticationServiceException {
+        throws AuthServiceException {
 
         final Map<String,Object> payload;
         try {
             payload = jwtVerifier.verify(token);
 
             if (payload.isEmpty()) {
-                throw new InternalAuthenticationServiceException("Empty payload in token");
+                throw new AuthServiceException("Empty payload in token");
             }
 
         } catch (final IllegalStateException | IOException jwtVerifyException) {
-            LOGGER.error("<In> verifyToken(): Failed to verify token", jwtVerifyException);
-            throw new InternalAuthenticationServiceException("Failed to verify token!");
+            logger.error("<In> verifyToken(): Failed to verify token", jwtVerifyException);
+            throw new AuthServiceException("Failed to verify token!");
         } catch (final JWTVerifyException | InvalidKeyException | NoSuchAlgorithmException | SignatureException invalidTokenException) {
-            LOGGER.error("<In> verifyToken(): Invalid token", invalidTokenException);
-            throw new InternalAuthenticationServiceException("Invalid Token!");
+            logger.error("<In> verifyToken(): Invalid token", invalidTokenException);
+            throw new AuthServiceException("Invalid Token!");
         }
 
         return payload;
     }
 
-    public Optional<String> getRefreshTokenByUserId (final Long userId) {
-        return Optional.ofNullable(tokenDao.getRefreshTokenByUserId(userId));
+    public String getRefreshTokenByUserId (final Long userId)
+        throws AuthServiceException {
+
+        try {
+            final String refreshToken = tokenDao.getRefreshTokenByUserId(userId);
+            if (refreshToken == null) {
+                throw new AuthServiceException();
+            }
+            return refreshToken;
+
+        } catch (final DBIException dbiException) {
+            logger.error("<In> getRefreshTokenByUserId(): Caught DBIException: {}", dbiException.toString());
+            throw new AuthServiceException();
+        }
     }
 }

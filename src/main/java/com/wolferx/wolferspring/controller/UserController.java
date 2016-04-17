@@ -1,8 +1,6 @@
 package com.wolferx.wolferspring.controller;
 
-import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.NoSuchItemException;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.User;
 import com.wolferx.wolferspring.service.UserService;
@@ -35,8 +33,7 @@ public class UserController {
         throws BaseServiceException {
 
         logger.info("<Start> getUserByUserId(): UserId: {}", userId);
-        final User user =  userService.getUserByUserId(userId)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getUserByUserId(): Not found: UserId: %s", userId), ErrorCode.ITEM_NOT_FOUND));
+        final User user =  userService.getUserByUserId(userId);
         logger.info("<End> getUserByUserId(): UserId: {}", userId);
 
         return user;
@@ -47,8 +44,7 @@ public class UserController {
         throws BaseServiceException {
 
         logger.info("<Start> getUserByEmail(): Email: {}", email);
-        final User user =  userService.getUserByEmail(email)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getUserByEmail(): Not found: UserId: %s", email), ErrorCode.ITEM_NOT_FOUND));
+        final User user =  userService.getUserByEmail(email);
         logger.info("<End> getUserByEmail(): Email: {}", email);
 
         return user;

@@ -14,6 +14,10 @@ public class RouteConfig {
     public static final String LOGOUT_URL = "/logout";
     public static final String LOGOUT_SUCCESS_URL = "/";
 
+    // Auth Exclusion
+    public static final String AUTH_EXCLUDE_LOGIN_URL = API_PATH + "/auth/login";
+    public static final String AUTH_EXCLUDE_REGISTER_URL = API_PATH + "/auth/register";
+
     // Spring Boot Actuator Services
     public static final String AUTOCONFIG_ENDPOINT = "/autoconfig";
     public static final String BEANS_ENDPOINT = "/beans";

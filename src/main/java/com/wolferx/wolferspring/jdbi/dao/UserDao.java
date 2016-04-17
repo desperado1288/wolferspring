@@ -13,9 +13,15 @@ import java.util.Date;
 @RegisterMapper(UserMapper.class)
 public abstract class UserDao {
 
+    @SqlQuery("SELECT * FROM user WHERE user_id = :user_id")
+    public abstract User getById(@Bind("user_id") final Long userId);
+
+    @SqlQuery("SELECT * FROM user WHERE email = :email")
+    public abstract User getByEmail(@Bind("email") final String email);
+
     @SqlUpdate(
         "INSERT INTO user(email, username, password, verified, access_level, status, last_login, time_created, time_updated)" +
-            "VALUES (:email, :username, :password, :verified, :access_level, :status, :time_created, :time_created, :time_created)")
+            "VALUES (:email, :username, :password, :verified, :access_level, :status, :time_created, :time_created, :time_updated)")
     @GetGeneratedKeys
     public abstract Long create(
         @Bind("email") final String email,
@@ -24,13 +30,8 @@ public abstract class UserDao {
         @Bind("verified") final Integer verified,
         @Bind("access_level") final Integer accessLevel,
         @Bind("status") final Integer status,
-        @Bind("time_created") final Date timeCreated);
-
-    @SqlQuery("SELECT * FROM user WHERE user_id = :user_id")
-    public abstract User getById(@Bind("user_id") final Long userId);
-
-    @SqlQuery("SELECT * FROM user WHERE email = :email")
-    public abstract User getByEmail(@Bind("email") final String email);
+        @Bind("time_created") final Date timeCreated,
+        @Bind("time_updated") final Date timeUpdated);
 
     abstract void close();
 }

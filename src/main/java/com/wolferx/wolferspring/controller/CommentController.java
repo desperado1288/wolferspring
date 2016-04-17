@@ -3,9 +3,7 @@ package com.wolferx.wolferspring.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.constant.Constant;
-import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.NoSuchItemException;
 import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.Comment;
@@ -53,8 +51,7 @@ public class CommentController {
         throws BaseServiceException {
 
         logger.info("<Start> getPostById(): PostId: {}", commentId);
-        final Comment comment =  commentService.getCommentById(commentId)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getCommentById(): Not found: commentId: %s", commentId), ErrorCode.ITEM_NOT_FOUND));
+        final Comment comment =  commentService.getCommentById(commentId);
         logger.info("<End> getPostById(): PostId: {}", commentId);
 
         return comment;
@@ -65,8 +62,7 @@ public class CommentController {
         throws BaseServiceException {
 
         logger.info("<Start> getCommentByPostId(): PostId: {}", postId);
-        final List<Comment> comments = commentService.getCommentByPostId(postId, Constant.COMMENT_STATUS_ACTIVE)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getCommentByPostId(): Not found: PostId: %s", postId), ErrorCode.ITEM_NOT_FOUND));
+        final List<Comment> comments = commentService.getCommentByPostId(postId, Constant.COMMENT_STATUS_ACTIVE);
         logger.info("<End> getCommentByPostId(): PostId: {}", postId);
 
         return comments;
@@ -96,11 +92,10 @@ public class CommentController {
 
         final Long commentId = (Long) CommonUtils.parserJsonNode("commentId", requestBody, Long.class, logger);
 
-        final Comment baseComment = commentService.getCommentById(commentId)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> updatePost(): Not found: CommentId: %s", commentId)));
+        final Comment preComment = commentService.getCommentById(commentId);
 
-        final String body = requestBody.has("commentBody") ? requestBody.get("commentBody").asText() : baseComment.getCommentBody();
-        final Long musicId = requestBody.has("musicId") ? requestBody.get("musicId").asLong() : baseComment.getMusicId();
+        final String body = requestBody.has("commentBody") ? requestBody.get("commentBody").asText() : preComment.getCommentBody();
+        final Long musicId = requestBody.has("musicId") ? requestBody.get("musicId").asLong() : preComment.getMusicId();
 
         logger.info("<Start> updateComment(): CommentId: {}", commentId);
         final Comment comment = commentService.updateCommentById(commentId, musicId, body);
@@ -110,13 +105,13 @@ public class CommentController {
     }
 
     @RequestMapping(value = "/{commentId}", method = RequestMethod.DELETE)
-    public Boolean deleteComment(@PathVariable("commentId") final Long commentId)
+    public String deleteComment(@PathVariable("commentId") final Long commentId)
         throws BaseServiceException {
 
         logger.info("<Start> deleteComment(): CommentId: " + commentId);
         commentService.deleteCommentById(commentId);
         logger.info("<End> deleteComment(): CommentId: " + commentId);
 
-        return true;
+        return Constant.RESPONSE_ACTION_SUCCESS;
     }
 }
