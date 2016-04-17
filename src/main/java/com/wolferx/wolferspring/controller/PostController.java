@@ -3,9 +3,7 @@ package com.wolferx.wolferspring.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.annotation.LoggedUser;
 import com.wolferx.wolferspring.common.constant.Constant;
-import com.wolferx.wolferspring.common.constant.ErrorCode;
 import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.NoSuchItemException;
 import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.config.RouteConfig;
 import com.wolferx.wolferspring.entity.Post;
@@ -45,8 +43,7 @@ public class PostController {
         throws BaseServiceException {
 
         logger.info("<Start> getPostById(): PostId: {}", postId);
-        final Post post =  postService.getPostById(postId)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> getPostById(): Not found: PostId: %s", postId), ErrorCode.ITEM_NOT_FOUND));
+        final Post post =  postService.getPostById(postId);
         logger.info("<End> getPostById(): PostId: {}", postId);
         return post;
     }
@@ -79,8 +76,7 @@ public class PostController {
         final Long postId = (Long) CommonUtils.parserJsonNode("postId", requestBody, Long.class, logger);
 
         logger.info("<Start> updatePost(): PostId: {}", postId);
-        final Post basePost = postService.getPostById(postId)
-            .orElseThrow(() -> new NoSuchItemException(String.format("<In> updatePost(): Not found: PostId: %s", postId)));
+        final Post basePost = postService.getPostById(postId);
 
         final String title = requestBody.has("postTitle") ? requestBody.get("postTitle").asText() : basePost.getPostTitle();
         final String body = requestBody.has("postBody") ? requestBody.get("postBody").asText() : basePost.getPostBody();
@@ -97,13 +93,13 @@ public class PostController {
     }
 
     @RequestMapping(value = "/{postId}", method = RequestMethod.DELETE)
-    public Boolean deletePost(@PathVariable("postId") final Long postId)
+    public String deletePost(@PathVariable("postId") final Long postId)
         throws BaseServiceException {
 
         logger.info("<Start> deletePost(): postId: {}", postId);
         postService.deletePostById(postId);
         logger.info("<End> deletePost(): postId: {}", postId);
 
-        return true;
+        return Constant.RESPONSE_ACTION_SUCCESS;
     }
 }

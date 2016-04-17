@@ -1,5 +1,7 @@
 package com.wolferx.wolferspring.common.security;
 
+import com.wolferx.wolferspring.common.exception.AuthServiceException;
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -24,8 +26,11 @@ public class PasswordAuthProvider implements AuthenticationProvider {
 
         final String username = (String) authentication.getPrincipal();
         final String password = (String) authentication.getCredentials();
-
-        return authService.authByPassword(username, password, false);
+        try {
+            return authService.authByPassword(username, password, false);
+        } catch (final StorageServiceException storageServiceException) {
+            throw new AuthServiceException();
+        }
     }
 
     @Override

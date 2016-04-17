@@ -1,18 +1,21 @@
 package com.wolferx.wolferspring.common.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.wolferx.wolferspring.common.exception.InvalidRequestInputException;
+import com.wolferx.wolferspring.common.constant.Constant;
+import com.wolferx.wolferspring.common.exception.InvalidInputException;
+import org.skife.jdbi.v2.exceptions.DBIException;
 import org.slf4j.Logger;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class CommonUtils {
 
     public static Object parserJsonNode(final String key, final JsonNode sourceNode, final Class clazz, final Logger logger)
-        throws InvalidRequestInputException {
+        throws InvalidInputException {
 
         try {
             if (clazz.equals(String.class)) {
@@ -22,11 +25,11 @@ public class CommonUtils {
             } else if (clazz.equals(Integer.class)){
                 return sourceNode.get(key).asInt();
             } else {
-                throw new InvalidRequestInputException("Missing required input");
+                throw new InvalidInputException("Missing required input");
             }
         } catch (final NullPointerException nullPointerException) {
             logger.error("<In> parserJsonNode(): Missing required input", nullPointerException);
-            throw new InvalidRequestInputException("Missing required input");
+            throw new InvalidInputException("Missing required input");
         }
     }
 
@@ -50,5 +53,15 @@ public class CommonUtils {
             }
         }
         return Optional.empty();
+    }
+
+    public static Boolean isDuplicateEntryException(final DBIException exception) {
+        if (exception.getCause() instanceof SQLException) {
+            final String sqlState = ((SQLException) exception.getCause()).getSQLState();
+            if (sqlState.equals(Constant.SQL_EXCEPTION_DUPLICATE_ENTRY)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

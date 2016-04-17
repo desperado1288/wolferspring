@@ -2,8 +2,10 @@ package com.wolferx.wolferspring.service;
 
 import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.constant.Role;
-import com.wolferx.wolferspring.common.exception.BaseServiceException;
-import com.wolferx.wolferspring.common.exception.InsertItemAlreadyExistException;
+import com.wolferx.wolferspring.common.exception.AuthServiceException;
+import com.wolferx.wolferspring.common.exception.DuplicateItemException;
+import com.wolferx.wolferspring.common.exception.ItemNotFoundException;
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
 import com.wolferx.wolferspring.common.security.JWTAuthRefreshToken;
 import com.wolferx.wolferspring.common.security.JWTAuthToken;
 import com.wolferx.wolferspring.entity.Token;
@@ -11,8 +13,6 @@ import com.wolferx.wolferspring.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -34,36 +34,39 @@ public class AuthService {
         this.tokenService = tokenService;
     }
 
-    public UsernamePasswordAuthenticationToken registerUser(final String email, final String password)
-        throws BaseServiceException {
-
-        // if: user already exist
-        if (userService.getUserByEmail(email).isPresent()) {
-            throw new InsertItemAlreadyExistException("Registering User has already exist");
-        }
+    public UsernamePasswordAuthenticationToken registerUser(final String email, final String password, final String username)
+        throws AuthServiceException {
 
         final String salt = BCrypt.gensalt(Constant.AUTH_JWT_SALT_LENGTH).concat(Constant.AUTH_JWT_SECRET);
         final String hash = BCrypt.hashpw(password, salt);
-        final User user = userService.createUser(email, hash);
-
+        final User user;
+        try {
+            user = userService.createUser(email, hash, username);
+        } catch (final ItemNotFoundException | DuplicateItemException | StorageServiceException baseServiceException) {
+            logger.error("<In> authByRefreshToken(): Caught BaseServiceException: ", baseServiceException.toString());
+            throw new AuthServiceException();
+        }
         return authByUser(user);
     }
 
     public UsernamePasswordAuthenticationToken authByPassword(final String email, final String password, final Boolean rememberMe)
-        throws AuthenticationServiceException {
+        throws  AuthServiceException,
+        StorageServiceException {
 
         logger.info("<Start> authWithPassword(): User: {}", email);
         // verify user existence
-        final User user = userService.getUserByEmail(email)
-            .orElseThrow(() -> {
-                logger.error("<In> authWithPassword(): Not get User: {}", email);
-                return new AuthenticationServiceException("Unable to authenticate User with provided credentials");
-            });
+        final User user;
+        try {
+            user = userService.getUserByEmail(email);
+        } catch (final ItemNotFoundException | StorageServiceException baseServiceException) {
+            logger.error("<In> authByRefreshToken(): Caught BaseServiceException: ", baseServiceException.toString());
+            throw new AuthServiceException();
+        }
 
         // verify user password
         if (!BCrypt.checkpw(password, user.getPassword())) {
-            logger.info("<In> authWithPassword(): Invalid password for User: {}", email);
-            throw new AuthenticationServiceException("Unable to authenticate User with provided credentials");
+            logger.error("<In> authWithPassword(): Invalid password for User: {}", email);
+            throw new AuthServiceException();
         }
 
         // grant user roles
@@ -91,28 +94,21 @@ public class AuthService {
     }
 
     public JWTAuthToken authByToken(final String token)
-        throws AuthenticationServiceException {
+        throws AuthServiceException {
 
         logger.debug("<Start> authWithToken()");
         // verify token
         final Map<String, Object> payload = tokenService.verifyToken(token);
 
         // get user
-        final Long userId;
+        final Long userId = ((Integer) payload.get("userId")).longValue();
+        final User user;
         try {
-            userId  = ((Integer) payload.get("userId")).longValue();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("<In> verifyToken(): Missing UserId in token : TokenPayload: {}", payload.toString());
-            throw new InternalAuthenticationServiceException("Invalid Token!");
+            user = userService.getUserByUserId(userId);
+        } catch (final ItemNotFoundException | StorageServiceException baseServiceException) {
+            logger.error("<In> authByRefreshToken(): Caught BaseServiceException: ", baseServiceException.toString());
+            throw new AuthServiceException();
         }
-
-        tokenService.getRefreshTokenByUserId(userId);
-
-        final User user = userService.getUserByUserId(userId)
-            .orElseThrow(()-> {
-                logger.error("<In> authWithToken(): Failed to get user : UserId: {}", userId);
-                return new AuthenticationServiceException("Failed to authenticate User with provided token");
-            });
 
         // set authentication
         final JWTAuthToken authentication;
@@ -129,41 +125,29 @@ public class AuthService {
     }
 
     public JWTAuthRefreshToken authByRefreshToken(final String refreshToken)
-        throws AuthenticationServiceException {
+        throws AuthServiceException {
 
         logger.debug("<Start> authByRefreshToken()");
         // verify token
         final Map<String, Object> payload = tokenService.verifyToken(refreshToken);
-
         // get user
-        final Long userId;
-        try {
-            userId  = ((Integer) payload.get("userId")).longValue();
-        } catch (final NullPointerException nullPointerException) {
-            logger.error("<In> authByRefreshToken(): Missing UserId in token : TokenPayload: {}", payload.toString());
-            throw new InternalAuthenticationServiceException("Invalid RefreshToken!");
-        }
-
+        final Long userId = ((Integer) payload.get("userId")).longValue();
         // get stored refresh token
-        final String storedRefreshToken = tokenService.getRefreshTokenByUserId(userId)
-            .orElseThrow(() -> {
-                logger.error("<In> authByRefreshToken(): Empty stored RefreshToken : TokenPayload: {}", payload.toString());
-                return new InternalAuthenticationServiceException("Invalid RefreshToken!");
-            });
-
+        final String storedRefreshToken = tokenService.getRefreshTokenByUserId(userId);
         // validate refresh token
         if (!refreshToken.equals(storedRefreshToken)) {
             logger.error("<In> authByRefreshToken(): Expired stored RefreshToken : TokenPayload: {}", payload.toString());
-            throw new InternalAuthenticationServiceException("Invalid RefreshToken!");
+            throw new AuthServiceException();
         }
-
         // generate new token
         final String newToken = tokenService.genToken(userId);
-        final User user = userService.getUserByUserId(userId)
-            .orElseThrow(()-> {
-                logger.error("<In> authByRefreshToken(): Failed to get user : UserId: {}", userId);
-                return new AuthenticationServiceException("Failed to authenticate User with provided token");
-            });
+        final User user;
+        try {
+            user = userService.getUserByUserId(userId);
+        } catch (final ItemNotFoundException | StorageServiceException baseServiceException) {
+            logger.error("<In> authByRefreshToken(): Caught BaseServiceException: ", baseServiceException.toString());
+            throw new AuthServiceException();
+        }
 
         // set authentication
         final JWTAuthRefreshToken authentication;
@@ -179,8 +163,7 @@ public class AuthService {
         return authentication;
     }
 
-    public UsernamePasswordAuthenticationToken authByUser(final User user)
-        throws AuthenticationServiceException {
+    public UsernamePasswordAuthenticationToken authByUser(final User user) {
 
         logger.debug("<Start> authWithUser()");
         // grant user roles

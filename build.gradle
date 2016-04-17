@@ -64,15 +64,9 @@ dependencies {
     compile("mysql:mysql-connector-java")
     //runtime("com.h2database:h2")
 
-    // cache
-    compile("net.sf.ehcache:ehcache-core:2.6.9") {
-        exclude(group: "commons-logging")
-    }
-
     // utils
     compile("com.auth0:java-jwt:2.1.0")
     compile("com.google.guava:guava:19.0")
-    compile("com.alibaba:fastjson:1.2.8")
 
     /*
     compile 'commons-codec:commons-codec:1.4'

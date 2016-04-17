@@ -5,7 +5,6 @@ import com.wolferx.wolferspring.jdbi.mapper.TokenMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
-import org.skife.jdbi.v2.sqlobject.Transaction;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
 import java.util.Date;
@@ -38,16 +37,6 @@ public abstract class TokenDao {
 
     @SqlQuery("SELECT refresh_token FROM token WHERE user_id = :user_id")
     public abstract String getRefreshTokenByUserId(@Bind("user_id") Long userId);
-
-    @Transaction
-    public Integer upsert(Long userId, String device, String ip, String refreshToken, Date timeNow) {
-        try {
-            getRefreshTokenByUserId(userId);
-            return update(userId, device, ip, refreshToken, timeNow);
-        } catch (final NullPointerException nullPointerException) {
-            return create(userId, device, ip, refreshToken, timeNow);
-        }
-    }
 
     abstract void close();
 }

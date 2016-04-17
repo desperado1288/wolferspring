@@ -18,7 +18,7 @@ public class User implements Serializable {
 
     protected User() { }
 
-    public User(Long userId, String email, String username, String password, Integer verified,
+    public User(final Long userId, String email, String username, String password, Integer verified,
                 Integer accessLevel, Integer status, Date lastLogin, Date timeCreated, Date timeUpdated) {
 
         this.userId = userId;

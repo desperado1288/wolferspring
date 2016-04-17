@@ -20,10 +20,17 @@ public class Constant {
      * Response
      */
     public final static String  RESPONSE_ACTION_SUCCESS = "ACTION HAS BEEN EXECUTED SUCCESSFULLY";
+    public final static String  RESPONSE_ERROR_AUTHENTICATION = "Unable to authenticate User with provided credentials";
+
+    /**
+     * SQL Exception State
+     */
+    public static final String SQL_EXCEPTION_DUPLICATE_ENTRY = "23000";
 
     /**
      * User
      */
+    public final static String   USER_NULL_USERNAME = null;
     public final static Integer  USER_NOT_VERIFIED = 0;
     public final static Integer  USER_VERIFIED = 1;
     public final static Integer  USER_STATUS_INACTIVE = 0;

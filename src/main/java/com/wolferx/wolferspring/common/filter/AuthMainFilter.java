@@ -4,6 +4,7 @@ import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.security.JWTAuthRefreshToken;
 import com.wolferx.wolferspring.common.security.JWTAuthToken;
 import com.wolferx.wolferspring.common.utils.CommonUtils;
+import com.wolferx.wolferspring.config.RouteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -39,91 +41,64 @@ public class AuthMainFilter extends GenericFilterBean {
 
         final HttpServletRequest request = (HttpServletRequest) req;
         final HttpServletResponse response = (HttpServletResponse) res;
-        //final Optional<String> inputToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_TOKEN_HEADER));
-        //final Optional<String> inputRefreshToken = Optional.ofNullable(request.getHeader(Constant.AUTH_JWT_REFRESH_TOKEN_HEADER));
         final Optional<Cookie> jwtCookie = CommonUtils.getCookie(request, Constant.AUTH_JWT_TOKEN_COOKIE);
         final Optional<Cookie> jwtRefreshCookie = CommonUtils.getCookie(request, Constant.AUTH_JWT_REFRESH_TOKEN_COOKIE);
+        final String resourcePath = new UrlPathHelper().getPathWithinApplication(request);
 
-        try {
-            /**
-             * call: username password authentication
-             * when: post request to /api/v1/auth
-             * deprecated: using /api/v1/auth/login to authenticate user
-             */
-            /*
-            final String resourcePath = new UrlPathHelper().getPathWithinApplication(request);
-            final Optional<String> inputEmail = Optional.ofNullable(request.getHeader(Constant.AUTH_USERNAME_HEADER));
-            final Optional<String> inputPassword = Optional.ofNullable(request.getHeader(Constant.AUTH_PASSWORD_HEADER));
-            if (RouteConfig.AUTH_URL.equalsIgnoreCase(resourcePath) && request.getMethod().equals("POST")) {
-
-                final String email = inputEmail.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
-                final String password = inputPassword.orElseThrow(() -> new BadCredentialsException("Invalid User Credentials"));
-
-                logger.info("<Start> Authenticate user with password. User: {}", email);
-                final UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
-                final Authentication authentication = authenticationManager.authenticate(authRequest);
-                if (authentication == null || !authentication.isAuthenticated()) {
-                    logger.error("<In> Failed to authenticate User with password. User: {}", email);
-                    throw new AuthenticationServiceException("Unable to authenticate User with provided credentials");
-                }
-                logger.info("<End> Authenticated with password. User: {}", email);
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                final TokenResponse tokenResponse = new TokenResponse(authentication.getDetails().toString());
-                final String tokenJsonResponse = new ObjectMapper().writeValueAsString(tokenResponse);
-
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.addHeader("Content-Type", "application/json");
-                response.getWriter().print(tokenJsonResponse);
-                return;
-            }
-            */
-
-            /**
-             * call: JWT authentication
-             * when: token is presented in header
-             */
-            if (jwtCookie.isPresent()) {
-
-                logger.debug("<Start> Authenticate user with token");
-                final String token = jwtCookie.get().getValue();
-                final JWTAuthToken authRequest = new JWTAuthToken(token, null);
-                final Authentication authentication = authenticationManager.authenticate(authRequest);
-                if (authentication == null || !authentication.isAuthenticated()) {
-                    logger.error("<In> Failed to authenticate User with token");
-                    throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
-                }
-                logger.debug("<End> Authenticate user with token");
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            } else if (jwtRefreshCookie.isPresent()) {
-
-                logger.debug("<Start> Authenticate user with refresh token");
-                final String refreshToken = jwtRefreshCookie.get().getValue();
-                final JWTAuthRefreshToken authRequest = new JWTAuthRefreshToken(refreshToken, null);
-                final Authentication authentication = authenticationManager.authenticate(authRequest);
-                if (authentication == null || !authentication.isAuthenticated()) {
-                    logger.error("<In> Failed to authenticate User with token");
-                    throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
-                }
-                logger.debug("<End> Authenticate user with refresh token");
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, authentication.getCredentials().toString(), Constant.AUTH_JWT_TOKEN_EXPIRE);
-            }
-
-            /**********
-             / if: neither password and token are presented
-             / then: pass request down to the filter chain
-             ***********/
-            logger.debug("<In> Passing request down the filter chain");
+        // exclude auth check for /login and /register api
+        if (RouteConfig.AUTH_EXCLUDE_LOGIN_URL.equals(resourcePath) ||
+            RouteConfig.AUTH_EXCLUDE_REGISTER_URL.equals(resourcePath)) {
             chain.doFilter(req, res);
+        } else {
+            try {
+                /**
+                 * call: JWT authentication
+                 * when: token is presented in header
+                 */
+                if (jwtCookie.isPresent()) {
 
-        } catch (final AuthenticationException authenticationException) {
-            SecurityContextHolder.clearContext();
-            logger.error("<In> Authentication Exception", authenticationException);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authenticationException.getMessage());
+                    logger.debug("<Start> Authenticate user with token");
+                    final String token = jwtCookie.get().getValue();
+                    final JWTAuthToken authRequest = new JWTAuthToken(token, null);
+                    final Authentication authentication = authenticationManager.authenticate(authRequest);
+                    if (authentication == null || !authentication.isAuthenticated()) {
+                        logger.error("<In> Failed to authenticate User with token");
+                        throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
+                    }
+                    logger.debug("<End> Authenticate user with token");
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                } else if (jwtRefreshCookie.isPresent()) {
+
+                    logger.debug("<Start> Authenticate user with refresh token");
+                    final String refreshToken = jwtRefreshCookie.get().getValue();
+                    final JWTAuthRefreshToken authRequest = new JWTAuthRefreshToken(refreshToken, null);
+                    final Authentication authentication = authenticationManager.authenticate(authRequest);
+                    if (authentication == null || !authentication.isAuthenticated()) {
+                        logger.error("<In> Failed to authenticate User with token");
+                        throw new AuthenticationServiceException("Unable to authenticate User for provided credentials");
+                    }
+                    logger.debug("<End> Authenticate user with refresh token");
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, authentication.getCredentials().toString(), Constant.AUTH_JWT_TOKEN_EXPIRE);
+                }
+
+                /**********
+                 / if: neither password and token are presented
+                 / then: pass request down to the filter chain
+                 ***********/
+                logger.debug("<In> Passing request down the filter chain");
+                chain.doFilter(req, res);
+
+            } catch (final AuthenticationException authenticationException) {
+                // clear JWT token cookie
+                CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, "", 0);
+                CommonUtils.addCookie(response, Constant.AUTH_JWT_REFRESH_TOKEN_COOKIE, "", 0);
+                SecurityContextHolder.clearContext();
+                logger.error("<In> Authentication Exception", authenticationException);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authenticationException.getMessage());
+            }
         }
     }
 

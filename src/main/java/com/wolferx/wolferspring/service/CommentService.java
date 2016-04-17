@@ -1,15 +1,19 @@
 package com.wolferx.wolferspring.service;
 
 import com.wolferx.wolferspring.common.constant.Constant;
+import com.wolferx.wolferspring.common.exception.DuplicateItemException;
+import com.wolferx.wolferspring.common.exception.ItemNotFoundException;
+import com.wolferx.wolferspring.common.exception.StorageServiceException;
+import com.wolferx.wolferspring.common.utils.CommonUtils;
 import com.wolferx.wolferspring.entity.Comment;
 import com.wolferx.wolferspring.jdbi.dao.CommentDao;
+import org.skife.jdbi.v2.exceptions.DBIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -20,30 +24,80 @@ public class CommentService {
     @Autowired
     public CommentService(final CommentDao dao) { this.commentDao = dao; }
 
-    public Comment createComment(final Long userId, final Long postId, final Long musicId, final String commentBody) {
+    public List<Comment> getAllComment(final Integer status)
+        throws ItemNotFoundException, StorageServiceException {
 
-        final Date timeNow = new Date();
-        return commentDao.create(userId, postId, musicId, commentBody, Constant.COMMENT_STATUS_ACTIVE, timeNow, timeNow);
+        try {
+            final List<Comment> commentList = commentDao.getAll(status);
+            if (commentList.isEmpty()) {
+                throw new ItemNotFoundException();
+            }
+            return commentList;
+
+        } catch (final DBIException dbiException) {
+            throw new StorageServiceException(dbiException);
+        }
     }
 
-    public List<Comment> getAllComment(final Integer status) {
+    public List<Comment> getCommentByPostId(final Long postId, final Integer status)
+        throws ItemNotFoundException, StorageServiceException {
 
-        return commentDao.getAll(status);
+        try {
+            final List<Comment> commentList = commentDao.getAllByPostId(postId, status);
+            if (commentList.isEmpty()) {
+                throw new ItemNotFoundException();
+            }
+            return commentList;
+
+        } catch (final DBIException dbiException) {
+            throw new StorageServiceException(dbiException);
+        }
     }
 
-    public Optional<List<Comment>> getCommentByPostId(final Long postId, final Integer status) {
+    public Comment getCommentById(final Long commentId)
+        throws ItemNotFoundException, StorageServiceException {
 
-        return Optional.ofNullable(commentDao.getAllByPostId(postId, status));
+        try {
+            final Comment comment = commentDao.getById(commentId);
+            if (comment == null) {
+                throw new ItemNotFoundException();
+            }
+            return comment;
+
+        } catch (final DBIException dbiException) {
+            throw new StorageServiceException(dbiException);
+        }
     }
 
-    public Optional<Comment> getCommentById(final Long commentId) {
+    public Comment createComment(final Long userId, final Long postId, final Long musicId, final String commentBody)
+        throws DuplicateItemException, ItemNotFoundException, StorageServiceException {
 
-        return Optional.ofNullable(commentDao.getById(commentId));
+        try {
+            final Date timeNow = new Date();
+            final Long commentId = commentDao.create(userId, postId, musicId, commentBody, Constant.COMMENT_STATUS_ACTIVE, timeNow, timeNow);
+            return getCommentById(commentId);
+
+        } catch (final DBIException dbiException) {
+            if (CommonUtils.isDuplicateEntryException(dbiException)) {
+                throw new DuplicateItemException(dbiException);
+            }
+            throw new StorageServiceException(dbiException);
+        }
     }
 
-    public Comment updateCommentById(final Long commentId, final Long musicId, final String commentBody) {
+    public Comment updateCommentById(final Long commentId, final Long musicId, final String commentBody)
+        throws ItemNotFoundException, StorageServiceException {
 
-        return commentDao.update(commentId, musicId, commentBody);
+            try {
+                final Date timeNow = new Date();
+                final Integer changes = commentDao.update(commentId, musicId, commentBody, timeNow);
+                if (changes == 0) {
+                    throw new ItemNotFoundException();
+                }
+                return getCommentById(commentId);
+            } catch (final DBIException dbiException) {
+                throw new StorageServiceException(dbiException);
+            }
     }
 
     public void deleteCommentById(final Long commentId) {

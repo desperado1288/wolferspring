@@ -45,7 +45,7 @@ public class AuthController {
 
         // register user
         logger.info("<Start> registerUser(): for User: {} ", email);
-        final Authentication authentication = authService.registerUser(email, password);
+        final Authentication authentication = authService.registerUser(email, password, Constant.USER_NULL_USERNAME);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final Token token = (Token) authentication.getDetails();
         CommonUtils.addCookie(response, Constant.AUTH_JWT_TOKEN_COOKIE, token.getToken(), -1);
