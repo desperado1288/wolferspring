@@ -1,7 +1,10 @@
 package com.wolferx.wolferspring.common.exception;
 
 import com.wolferx.wolferspring.common.constant.ErrorCode;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class InvalidInputException extends BaseServiceException {
 
     public InvalidInputException() {

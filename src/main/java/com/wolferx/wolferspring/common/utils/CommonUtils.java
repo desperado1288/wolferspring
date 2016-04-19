@@ -3,8 +3,11 @@ package com.wolferx.wolferspring.common.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.wolferx.wolferspring.common.constant.Constant;
 import com.wolferx.wolferspring.common.exception.InvalidInputException;
+import com.wolferx.wolferspring.common.response.ErrorResponse;
 import org.skife.jdbi.v2.exceptions.DBIException;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -63,5 +66,9 @@ public class CommonUtils {
             }
         }
         return false;
+    }
+
+    public static ResponseEntity<Object> genErrorResponse(final HttpStatus httpStatus, final String message, final HttpServletRequest request) {
+        return ResponseEntity.status(httpStatus).body(new ErrorResponse(httpStatus, message, request));
     }
 }

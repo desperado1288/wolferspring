@@ -2,7 +2,7 @@ package com.wolferx.wolferspring.common.exception;
 
 import com.wolferx.wolferspring.common.constant.ErrorCode;
 
-public class BaseServiceException extends Exception {
+public class BaseServiceException extends RuntimeException {
 
     private ErrorCode errorCode;
     private String error;

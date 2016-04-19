@@ -29,7 +29,7 @@ public class AuthService {
     private final TokenService tokenService;
 
     @Autowired
-    AuthService(final UserService userService, final TokenService tokenService) {
+    public AuthService(final UserService userService, final TokenService tokenService) {
         this.userService = userService;
         this.tokenService = tokenService;
     }
@@ -65,7 +65,7 @@ public class AuthService {
 
         // verify user password
         if (!BCrypt.checkpw(password, user.getPassword())) {
-            logger.error("<In> authWithPassword(): Invalid password for User: {}", email);
+            logger.warn("<In> authWithPassword(): Invalid password for User: {}", email);
             throw new AuthServiceException();
         }
 

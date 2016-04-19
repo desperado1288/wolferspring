@@ -36,9 +36,7 @@ public class TokenService {
         .setNotValidBeforeLeeway(5).setIssuedAt(true)
         .setJwtId(true);
 
-    private TokenDao tokenDao;
-
-    public TokenService() { }
+    private final TokenDao tokenDao;
 
     @Autowired
     public TokenService(TokenDao tokenDao) {

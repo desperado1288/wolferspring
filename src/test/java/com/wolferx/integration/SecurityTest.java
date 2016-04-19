@@ -3,7 +3,7 @@ package com.wolferx.integration;
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringApplicationConfiguration(classes = {Application.class, SecurityTest.SecurityTestConfig.class})
 //@WebAppConfiguration
-//@IntegrationTest("server.port:0")
+//@IntegrationTest({"server.port:0", "management.port=0"})
 public class SecurityTest {
     /*
     private static final String X_AUTH_USERNAME = "X-Auth-Username";
