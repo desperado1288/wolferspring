@@ -5,7 +5,7 @@ import com.wolferx.wolferspring.common.constant.ErrorCode;
 public class ItemNotFoundException extends BaseServiceException {
 
     public ItemNotFoundException() {
-        super("Item not found");
+        super();
     }
 
     public ItemNotFoundException(final String error) {

@@ -6,7 +6,7 @@ public class DuplicateItemException extends BaseServiceException {
 
     public DuplicateItemException() {
 
-        super("Duplicate item already exist");
+        super();
     }
 
     public DuplicateItemException(final String error) {
@@ -16,7 +16,7 @@ public class DuplicateItemException extends BaseServiceException {
 
     public DuplicateItemException(final Throwable cause) {
 
-        super("Duplicate item already exist", cause);
+        super(cause);
     }
 
     public DuplicateItemException(final String error, final Throwable cause) {

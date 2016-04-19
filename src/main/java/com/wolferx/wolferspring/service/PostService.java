@@ -22,7 +22,7 @@ public class PostService {
     private final PostDao postDao;
 
     @Autowired
-    PostService(final PostDao postDao) {
+    public PostService(final PostDao postDao) {
         this.postDao = postDao;
     }
 
