@@ -1,4 +1,4 @@
-package com.wolferx.integration;
+package com.weshare.integration;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringApplicationConfiguration(classes = {Application.class, SecurityTest.SecurityTestConfig.class})
