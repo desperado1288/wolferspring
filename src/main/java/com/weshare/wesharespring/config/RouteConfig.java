@@ -9,6 +9,7 @@ public class RouteConfig {
     public static final String AUTH_URL = API_PATH + "/auth";
     public static final String PROFILE_URL = API_PATH + "/profile";
     public static final String TOPIC_URL = API_PATH + "/topic";
+    public static final String APPOINTMENT_URL = API_PATH + "/appoint";
 
     // Logout
     public static final String LOGOUT_URL = API_PATH + "/logout";

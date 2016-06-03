@@ -2,10 +2,7 @@ package com.weshare.wesharespring.config;
 
 import com.weshare.wesharespring.common.client.AwsS3Client;
 import com.weshare.wesharespring.common.filter.CorsFilter;
-import com.weshare.wesharespring.jdbi.dao.ProfileDao;
-import com.weshare.wesharespring.jdbi.dao.TokenDao;
-import com.weshare.wesharespring.jdbi.dao.TopicDao;
-import com.weshare.wesharespring.jdbi.dao.UserDao;
+import com.weshare.wesharespring.jdbi.dao.*;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -52,4 +49,6 @@ public class AppConfig {
     public ProfileDao profileDao() { return this.appDbi.onDemand(ProfileDao.class); }
     @Bean
     public TopicDao topicDao() { return this.appDbi.onDemand(TopicDao.class); }
+    @Bean
+    public AppointmentDao appointmentDao() { return this.appDbi.onDemand(AppointmentDao.class); }
 }

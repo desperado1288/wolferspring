@@ -66,6 +66,11 @@ public class Constant {
     public static final Integer TOPIC_TYPE_TEXT = 1;
     public static final Integer TOPIC_TYPE_MUSIC = 2;
 
+    /**
+     * Appointment
+     */
+    public static final Integer APPOINTMENT_STATUS_INACTIVE = 0;
+    public static final Integer APPOINTMENT_STATUS_ACTIVE = 1;
 
 
     /**
