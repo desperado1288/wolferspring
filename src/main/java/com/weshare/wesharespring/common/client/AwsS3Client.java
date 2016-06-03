@@ -33,7 +33,7 @@ public class AwsS3Client {
 
     public AwsS3Client() {
         logger.info("Connecting to AWS S3...");
-        final BasicAWSCredentials awsCredentials = new BasicAWSCredentials("AKIAIRXLSM4CM5Z4NLLA", "pQGxssD0Wdyls3aiiQC4+TnmsCAAw4hz4nB1Wjkl");
+        final BasicAWSCredentials awsCredentials = new BasicAWSCredentials("", "");
         final ClientConfiguration clientConfig = new ClientConfiguration();
         clientConfig.setProtocol(Protocol.HTTP);
         this.s3Client = new AmazonS3Client(awsCredentials, clientConfig);
