@@ -2,7 +2,11 @@ package com.weshare.wesharespring.config;
 
 import com.weshare.wesharespring.common.client.AwsS3Client;
 import com.weshare.wesharespring.common.filter.CorsFilter;
-import com.weshare.wesharespring.jdbi.dao.*;
+import com.weshare.wesharespring.jdbi.dao.AppointmentDao;
+import com.weshare.wesharespring.jdbi.dao.ProfileDao;
+import com.weshare.wesharespring.jdbi.dao.TokenDao;
+import com.weshare.wesharespring.jdbi.dao.TopicDao;
+import com.weshare.wesharespring.jdbi.dao.UserDao;
 import org.skife.jdbi.v2.DBI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
